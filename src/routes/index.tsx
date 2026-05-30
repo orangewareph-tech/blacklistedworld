@@ -102,7 +102,7 @@ function Index() {
       {/* Header */}
       <header className="bg-surface/80 backdrop-blur-xl border-b border-border px-4 md:px-8 py-3.5 flex items-center justify-between flex-wrap gap-4 sticky top-0 z-50">
         <a href="/" className="flex items-center gap-2.5 group cursor-pointer">
-          <img src={blacklistedLogo} alt="BlackListed" className="h-9 md:h-10 w-auto rounded-sm shadow-[0_2px_12px_rgba(229,57,53,0.35)]" />
+          <img src={blacklistedLogo} alt="BlackListed" className="h-9 md:h-10 w-auto drop-shadow-[0_2px_8px_rgba(229,57,53,0.5)]" />
         </a>
         <nav className="hidden lg:flex items-center gap-6 text-sm text-muted-foreground">
           <button onClick={() => scrollTo("search-section")} className="hover:text-white transition-colors">Search</button>
