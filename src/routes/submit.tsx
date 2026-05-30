@@ -133,8 +133,9 @@ function SubmitPage() {
 
           {done ? (
             <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
-              ✅ <strong>Report submitted for review.</strong>
+              <div className="inline-flex items-center gap-2 justify-center"><CheckCircle2 className="w-4 h-4" strokeWidth={1.75} /> <strong>Report submitted for review.</strong></div>
               <div className="mt-3 text-foreground">
+
                 Your ticket number:
                 <div className="text-2xl font-mono font-bold mt-1 tracking-wider">{done.ticket}</div>
               </div>
