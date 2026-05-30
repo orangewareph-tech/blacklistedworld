@@ -429,7 +429,7 @@ function Index() {
             </p>
           </div>
           <div className="bl-card p-6">
-            <h3 className="text-lg font-bold mb-2">🧹 Review & Removal Policy</h3>
+            <h3 className="text-lg font-bold mb-2 inline-flex items-center gap-2"><Brush className="w-4 h-4 text-white" strokeWidth={1.5} /> Review & Removal Policy</h3>
             <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
               <li>Reject submissions or edit for compliance.</li>
               <li>Remove abusive, duplicate, or unsupported content.</li>
