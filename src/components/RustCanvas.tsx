@@ -95,29 +95,7 @@ export function RustCanvas() {
     for (let i = 0; i < 135; i++) particles.push(new Particle(width, height));
 
     const mouse: { x: number | null; y: number | null } = { x: null, y: null };
-    const onMove = (e: MouseEvent) => {
-      const r = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
-    };
-    const onLeave = () => { mouse.x = null; mouse.y = null; };
-    const onClick = (e: MouseEvent) => {
-      const r = canvas.getBoundingClientRect();
-      const cx = e.clientX - r.left;
-      const cy = e.clientY - r.top;
-      for (let i = 0; i < 28; i++) {
-        const p = new Particle(width, height, cx, cy);
-        p.vx = (Math.random() - 0.5) * 3.2;
-        p.vy = (Math.random() - 0.5) * 3.2;
-        p.alpha = 0.85 + Math.random() * 0.12;
-        p.size = Math.random() * 3.2 + 1.1;
-        particles.push(p);
-      }
-      while (particles.length > 220) particles.shift();
-    };
-    canvas.addEventListener("mousemove", onMove);
-    canvas.addEventListener("mouseleave", onLeave);
-    canvas.addEventListener("click", onClick);
+
 
     let raf = 0;
     const animate = () => {
