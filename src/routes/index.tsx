@@ -122,7 +122,7 @@ function Index() {
           <button onClick={() => scrollTo("privacy-section")} className="hover:text-white transition-colors">Privacy</button>
           {isAdmin && <Link to="/admin" className="hover:text-white transition-colors">Admin</Link>}
         </nav>
-        <div className="hidden md:flex items-center flex-1 max-w-md mx-2">
+        <div className="order-last md:order-none flex items-center w-full md:flex-1 md:max-w-md md:mx-2">
           <div className="relative w-full">
             <input
               type="text"
