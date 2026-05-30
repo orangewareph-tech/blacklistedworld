@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReportsIdRouteImport } from './routes/reports.$id'
 
@@ -32,6 +34,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -40,6 +47,11 @@ const AuthRoute = AuthRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -55,8 +67,10 @@ const ReportsIdRoute = ReportsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
@@ -64,8 +78,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
@@ -74,8 +90,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
@@ -85,8 +103,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/admin'
     | '/auth'
+    | '/contact'
     | '/profile'
     | '/reports'
     | '/submit'
@@ -94,8 +114,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/admin'
     | '/auth'
+    | '/contact'
     | '/profile'
     | '/reports'
     | '/submit'
@@ -103,8 +125,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/admin'
     | '/auth'
+    | '/contact'
     | '/profile'
     | '/reports'
     | '/submit'
@@ -113,8 +137,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
   ProfileRoute: typeof ProfileRoute
   ReportsRoute: typeof ReportsRouteWithChildren
   SubmitRoute: typeof SubmitRoute
@@ -143,6 +169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -155,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -187,8 +227,10 @@ const ReportsRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
   ProfileRoute: ProfileRoute,
   ReportsRoute: ReportsRouteWithChildren,
   SubmitRoute: SubmitRoute,
@@ -196,3 +238,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
