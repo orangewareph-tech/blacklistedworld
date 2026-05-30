@@ -48,47 +48,50 @@ function Index() {
   const scrollToSubmit = () => document.getElementById("submit-section")?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
+      <div className="grain-overlay" aria-hidden />
+
       {/* Header */}
-      <header className="bg-surface border-b border-border px-4 md:px-8 py-4 flex items-center justify-between flex-wrap gap-4 sticky top-0 z-50">
-        <div className="flex items-center gap-2 group cursor-default">
-          <div className="w-9 h-9 bg-primary rounded-md flex items-center justify-center text-lg transition-all duration-500 group-hover:rotate-[8deg] group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(229,57,53,0.5)]">
-            ⚠️
-          </div>
+      <header className="bg-surface/80 backdrop-blur-xl border-b border-border px-4 md:px-8 py-3.5 flex items-center justify-between flex-wrap gap-4 sticky top-0 z-50">
+        <div className="flex items-center gap-2.5 group cursor-default">
+          <div className="bl-logo-icon">⚠️</div>
           <div className="text-2xl font-extrabold tracking-tight text-white">
             Black<span className="text-[var(--accent-glow)]">Listed</span>
           </div>
         </div>
-        <div className="flex gap-3">
-          <button className="bl-btn-outline" onClick={() => alert("🔒 Login / Sign Up — Coming soon.")}>Log In</button>
-          <button className="bl-btn-primary" onClick={scrollToSubmit}>➕ Submit Report</button>
+        <div className="flex gap-2.5">
+          <button className="bl-btn bl-btn-outline" onClick={() => alert("🔒 Login / Sign Up — Coming soon.")}>Log In</button>
+          <button className="bl-btn bl-btn-primary" onClick={scrollToSubmit}>➕ Submit Report</button>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="relative max-w-3xl mx-auto px-6 py-16 md:py-20 text-center min-h-[420px] flex flex-col justify-center overflow-hidden">
+      <section className="relative max-w-3xl mx-auto px-6 py-20 md:py-24 text-center min-h-[460px] flex flex-col justify-center overflow-hidden">
         <RustCanvas />
         <div className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-3">
-            Check <span className="text-[var(--accent-glow)] underline underline-offset-8 decoration-[3px]">Before</span> You Trust.
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-border text-[0.7rem] uppercase tracking-[0.15em] text-muted-foreground mb-6">
+            <span className="live-dot" />
+            Live · Community-Verified
+          </div>
+          <h1 className="text-4xl md:text-6xl font-black tracking-[-0.03em] leading-[1.05] mb-4 text-white">
+            Check <span className="hero-highlight">Before</span> You Trust.
           </h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-md mx-auto mb-8">
+          <p className="text-muted-foreground text-base md:text-lg max-w-md mx-auto mb-9">
             Search our community-driven database of reported scammers before you send money, share info, or sign anything.
           </p>
-          <div className="flex bg-[var(--input-bg)] border-[1.5px] border-border rounded-full overflow-hidden max-w-[620px] mx-auto focus-within:border-[var(--accent-glow)] focus-within:shadow-[0_0_30px_rgba(255,82,82,0.2)] transition-all">
+          <div className="bl-search">
             <input
               type="text"
               placeholder="Name, phone number, email, or username..."
-              className="flex-1 bg-transparent border-none px-5 py-4 text-white outline-none min-w-0 placeholder:text-[#666]"
             />
-            <button className="bl-btn-primary !rounded-none !rounded-r-full !px-6" onClick={() => alert("🔍 Search coming soon")}>
+            <button className="bl-btn bl-btn-primary" onClick={() => alert("🔍 Search coming soon")}>
               🔍 Search
             </button>
           </div>
-          <p className="text-xs text-[#555] mt-3">Example: +1-555-0198 • johndoe@fake.com • @crypto_guru_fake</p>
+          <p className="text-xs text-[var(--text-muted)] mt-4">Example: +1-555-0198 • johndoe@fake.com • @crypto_guru_fake</p>
         </div>
-        <div className="absolute bottom-3 right-5 text-[0.65rem] text-[#444] z-20 pointer-events-none tracking-wider">
-          🦀 Rust Network • Live Warnings
+        <div className="absolute bottom-3 right-5 text-[0.65rem] text-[var(--text-muted)] z-20 pointer-events-none tracking-[0.15em] uppercase">
+          🦀 Rust Network
         </div>
       </section>
 
@@ -189,7 +192,7 @@ function Index() {
               <div className="bg-[rgba(255,179,0,0.06)] border border-[rgba(255,179,0,0.2)] rounded-lg p-4 text-xs text-[#bbb] text-center">
                 ⚠️ <strong className="text-[var(--amber)]">Legal Warning:</strong> By submitting this report, you certify that the information is true and accurate to the best of your knowledge. Filing a false report may result in legal consequences. All reports are moderated before publication.
               </div>
-              <button type="submit" className="bl-btn-primary w-full py-3 text-base">🛡️ Submit Report for Review</button>
+              <button type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">🛡️ Submit Report for Review</button>
             </form>
           ) : (
             <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
