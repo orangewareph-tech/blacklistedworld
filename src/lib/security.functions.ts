@@ -86,16 +86,17 @@ export const recordAuthFailure = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
-    const ip = getRequestIP({ xForwardedFor: true }) ?? null;
-    const ua = getRequestHeader("user-agent") ?? null;
+    const ip = getRequestIP({ xForwardedFor: true }) ?? "";
+    const ua = getRequestHeader("user-agent") ?? "";
     const { data: rec } = await supabaseAdmin.rpc("record_security_event", {
       _event_type: data.type,
-      _user_id: data.userId ?? null,
-      _email: data.email ?? null,
+      _user_id: data.userId ?? "",
+      _email: data.email ?? "",
       _ip: ip,
       _user_agent: ua,
       _metadata: { reason: data.reason ?? null },
     });
+
     return {
       blocked: (rec as { blocked?: boolean } | null)?.blocked === true,
       reason: (rec as { reason?: string } | null)?.reason ?? null,
