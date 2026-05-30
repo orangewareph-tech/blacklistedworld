@@ -45,8 +45,8 @@ export const verifyTurnstile = createServerFn({ method: "POST" })
     if (!json.success) {
       const { data: rec } = await supabaseAdmin.rpc("record_security_event", {
         _event_type: "captcha_fail",
-        _user_id: data.userId ?? null,
-        _email: data.email ?? null,
+        _user_id: data.userId ?? "",
+        _email: data.email ?? "",
         _ip: ip,
         _user_agent: ua,
         _metadata: { errors: json["error-codes"] ?? [], context: data.context ?? null },
@@ -63,13 +63,14 @@ export const verifyTurnstile = createServerFn({ method: "POST" })
     if (data.context === "signup") {
       await supabaseAdmin.rpc("record_security_event", {
         _event_type: "signup_attempt",
-        _user_id: data.userId ?? null,
-        _email: data.email ?? null,
+        _user_id: data.userId ?? "",
+        _email: data.email ?? "",
         _ip: ip,
         _user_agent: ua,
         _metadata: {},
       });
     }
+
 
     return { success: true, error: null, blocked: false };
   });
