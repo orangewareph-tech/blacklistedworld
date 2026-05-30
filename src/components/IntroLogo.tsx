@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 
 export function IntroLogo() {
-  const [stage, setStage] = useState<"in" | "out" | "done">(() => {
-    if (typeof window !== "undefined" && sessionStorage.getItem("bl-intro-seen")) {
-      return "done";
-    }
-    return "in";
-  });
+  const [stage, setStage] = useState<"in" | "out" | "done">("in");
 
   useEffect(() => {
-    if (stage === "done") return;
+    if (sessionStorage.getItem("bl-intro-seen")) {
+      setStage("done");
+      return;
+    }
     const tOut = setTimeout(() => setStage("out"), 4400);
     const tDone = setTimeout(() => {
       setStage("done");
@@ -19,7 +17,7 @@ export function IntroLogo() {
       clearTimeout(tOut);
       clearTimeout(tDone);
     };
-  }, [stage]);
+  }, []);
 
   if (stage === "done") return null;
 
