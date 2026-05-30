@@ -6,7 +6,7 @@ import { IntroLogo } from "@/components/IntroLogo";
 import { useAuth } from "@/hooks/useAuth";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, Plus, Search, Network, ClipboardList, ShieldCheck, AlertTriangle, Calendar, Paperclip, Users, FileText, FolderOpen, CheckCircle2, Scale, MessageCircle, Brush, Lock, Flag, Camera } from "lucide-react";
 import blacklistedLogo from "@/assets/blacklisted-logo.png";
 
 export const Route = createFileRoute("/")({
