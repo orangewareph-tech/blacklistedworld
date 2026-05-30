@@ -125,7 +125,7 @@ function Index() {
             Global Due Diligence · Community-Verified
           </div>
           <h1 className="mb-6 flex justify-center">
-            <img src={blacklistedLogo} alt="BlackListed — Protect Yourself Before You Transact" className="w-full max-w-md md:max-w-lg h-auto rounded-lg shadow-[0_20px_60px_-15px_rgba(229,57,53,0.5)]" />
+            <img src={blacklistedLogo} alt="BlackListed — Protect Yourself Before You Transact" className="w-full max-w-md md:max-w-lg h-auto drop-shadow-[0_20px_40px_rgba(229,57,53,0.45)]" />
           </h1>
           <p className="text-sm md:text-base uppercase tracking-[0.25em] text-[var(--accent-glow)] font-semibold mb-3">
             Protect Yourself Before You Transact
