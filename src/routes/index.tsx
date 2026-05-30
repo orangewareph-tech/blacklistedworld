@@ -183,9 +183,10 @@ function Index() {
               onChange={(e) => setHeroQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") runHeroSearch(); }}
             />
-            <button className="bl-btn bl-btn-primary" onClick={runHeroSearch}>
-              🔍 Search
+            <button className="bl-btn bl-btn-primary inline-flex items-center gap-1.5" onClick={runHeroSearch}>
+              <Search className="w-4 h-4" strokeWidth={1.75} /> Search
             </button>
+
           </div>
 
           <button
