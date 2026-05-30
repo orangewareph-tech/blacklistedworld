@@ -441,7 +441,7 @@ function Index() {
 
         {/* Privacy */}
         <div id="privacy-section" className="bl-card p-7 md:p-9 mb-16">
-          <h2 className="text-xl font-bold mb-3">🔐 Privacy Protection</h2>
+          <h2 className="text-xl font-bold mb-3 inline-flex items-center gap-2"><Lock className="w-5 h-5 text-white" strokeWidth={1.5} /> Privacy Protection</h2>
           <p className="text-sm text-muted-foreground mb-3">
             To protect privacy and comply with data protection laws, the following identifiers are <strong className="text-foreground">always partially masked</strong> before publication:
           </p>
