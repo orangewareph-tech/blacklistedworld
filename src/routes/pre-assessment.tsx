@@ -6,6 +6,8 @@ import { Turnstile } from "@/components/Turnstile";
 import { RequireVerifiedEmail } from "@/components/RequireVerifiedEmail";
 import { verifyTurnstile } from "@/lib/security.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { Search, CheckCircle2 } from "lucide-react";
+
 
 export const Route = createFileRoute("/pre-assessment")({
   head: () => ({
