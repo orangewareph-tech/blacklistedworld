@@ -123,7 +123,7 @@ function SubmitPage() {
       <div className="max-w-3xl mx-auto">
         <Link to="/" className="text-xs text-muted-foreground hover:text-white">← Back</Link>
         <div className="bl-card p-8 md:p-10 mt-3">
-          <h1 className="text-center text-2xl font-bold mb-1">📝 Submit Your Experience</h1>
+          <h1 className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><FileText className="w-5 h-5 text-white" strokeWidth={1.5} /> Submit Your Experience</h1>
           <p className="text-center text-muted-foreground mb-2 text-sm">
             Free of charge. <strong className="text-foreground">All submissions reviewed by admins before publication.</strong>
           </p>
