@@ -88,12 +88,17 @@ const reportCategories = [
 function Index() {
   const [submitted, setSubmitted] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [heroQuery, setHeroQuery] = useState("");
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
+  const runHeroSearch = () => {
+    navigate({ to: "/reports", search: { q: heroQuery.trim() || undefined } });
+  };
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
   };
+
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
@@ -144,11 +149,15 @@ function Index() {
             <input
               type="text"
               placeholder="Name, company, passport, wallet, phone, email, IBAN..."
+              value={heroQuery}
+              onChange={(e) => setHeroQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") runHeroSearch(); }}
             />
-            <button className="bl-btn bl-btn-primary" onClick={() => alert("🔍 Search coming soon")}>
+            <button className="bl-btn bl-btn-primary" onClick={runHeroSearch}>
               🔍 Search
             </button>
           </div>
+
           <button
             onClick={() => setShowFilters((v) => !v)}
             className="text-xs text-[var(--accent-glow)] mt-4 hover:underline tracking-wide"
