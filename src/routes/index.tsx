@@ -370,15 +370,17 @@ function Index() {
                   </label>
                 </div>
               </div>
-              <div className="bg-[rgba(255,179,0,0.06)] border border-[rgba(255,179,0,0.2)] rounded-lg p-4 text-xs text-[#bbb] text-center">
-                ⚠️ <strong className="text-[var(--amber)]">Legal Notice:</strong> The submitter is solely responsible for the accuracy and legality of the information. False, defamatory, or malicious reports may result in account termination and legal action.
+              <div className="bg-[rgba(255,179,0,0.06)] border border-[rgba(255,179,0,0.2)] rounded-lg p-4 text-xs text-[#bbb] text-center inline-flex items-start gap-2 w-full">
+                <AlertTriangle className="w-4 h-4 text-[var(--amber)] flex-shrink-0 mt-0.5" strokeWidth={1.5} />
+                <span><strong className="text-[var(--amber)]">Legal Notice:</strong> The submitter is solely responsible for the accuracy and legality of the information. False, defamatory, or malicious reports may result in account termination and legal action.</span>
               </div>
-              <button type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">🛡️ Submit Report for Review</button>
+              <button type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base inline-flex items-center justify-center gap-2"><ShieldCheck className="w-4 h-4" strokeWidth={1.5} /> Submit Report for Review</button>
             </form>
           ) : (
-            <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
-              ✅ <strong>Report Submitted.</strong> You'll receive an email and SMS verification link. After verification, our moderators will review within 24–72 hours.
+            <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7] inline-flex items-start gap-2 justify-center w-full">
+              <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" strokeWidth={1.75} /> <span><strong>Report Submitted.</strong> You'll receive an email and SMS verification link. After verification, our moderators will review within 24–72 hours.</span>
             </div>
+
           )}
         </div>
 
