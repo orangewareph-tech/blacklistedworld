@@ -73,8 +73,8 @@ function Index() {
             <span className="live-dot" />
             Live · Community-Verified
           </div>
-          <h1 className="text-4xl md:text-6xl font-black tracking-[-0.03em] leading-[1.05] mb-4 text-white">
-            Check <span className="hero-highlight">Before</span> You Trust.
+          <h1 className="mb-6 flex justify-center">
+            <img src={blacklistedLogo} alt="BlackListed — Check Before You Trust" className="w-full max-w-md md:max-w-lg h-auto rounded-lg shadow-[0_20px_60px_-15px_rgba(229,57,53,0.5)]" />
           </h1>
           <p className="text-muted-foreground text-base md:text-lg max-w-md mx-auto mb-9">
             Search our community-driven database of reported scammers before you send money, share info, or sign anything.
