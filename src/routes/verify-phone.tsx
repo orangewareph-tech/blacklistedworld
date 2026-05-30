@@ -2,6 +2,9 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { recordAuthFailure } from "@/lib/security.functions";
+import { useServerFn } from "@tanstack/react-start";
+
 
 export const Route = createFileRoute("/verify-phone")({
   head: () => ({
