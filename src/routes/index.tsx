@@ -285,7 +285,7 @@ function Index() {
 
         {/* Submit Report */}
         <div id="submit-section" className="bl-card p-8 md:p-10 mb-16 max-w-[760px] mx-auto">
-          <h2 className="text-center text-2xl font-bold mb-1">📝 Submit Your Experience</h2>
+          <h2 className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><FileText className="w-5 h-5 text-white" strokeWidth={1.5} /> Submit Your Experience</h2>
           <p className="text-center text-muted-foreground mb-2 text-sm">
             Free of charge. <strong className="text-foreground">Email and phone verification required before publication.</strong>
           </p>
