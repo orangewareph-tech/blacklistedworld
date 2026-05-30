@@ -144,9 +144,10 @@ function PreAssessmentPage() {
               </Field>
               <Turnstile onToken={setCaptchaToken} />
               {err && <p className="text-sm text-[var(--accent)]">{err}</p>}
-              <button disabled={busy || !captchaToken} type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">
-                {busy ? "Submitting…" : "🔍 Submit Pre-Assessment"}
+              <button disabled={busy || !captchaToken} type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base inline-flex items-center justify-center gap-2">
+                {busy ? "Submitting…" : (<><Search className="w-4 h-4" strokeWidth={1.5} /> Submit Pre-Assessment</>)}
               </button>
+
             </form>
           )}
         </div>
