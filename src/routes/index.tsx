@@ -252,7 +252,7 @@ function Index() {
         </div>
 
         {/* Recent Reports */}
-        <h2 id="reports-section" className="text-center text-2xl font-bold mb-1">⚠️ Recent Community Reports</h2>
+        <h2 id="reports-section" className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><AlertTriangle className="w-5 h-5 text-white" strokeWidth={1.5} /> Recent Community Reports</h2>
         <p className="text-center text-muted-foreground mb-8 text-sm">Independent user submissions. All identifiers are partially masked to protect privacy.</p>
         <div className="grid gap-5 mb-16 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {reports.map((r) => {
