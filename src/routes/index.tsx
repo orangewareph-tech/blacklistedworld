@@ -149,11 +149,15 @@ function Index() {
             <input
               type="text"
               placeholder="Name, company, passport, wallet, phone, email, IBAN..."
+              value={heroQuery}
+              onChange={(e) => setHeroQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") runHeroSearch(); }}
             />
-            <button className="bl-btn bl-btn-primary" onClick={() => alert("🔍 Search coming soon")}>
+            <button className="bl-btn bl-btn-primary" onClick={runHeroSearch}>
               🔍 Search
             </button>
           </div>
+
           <button
             onClick={() => setShowFilters((v) => !v)}
             className="text-xs text-[var(--accent-glow)] mt-4 hover:underline tracking-wide"
