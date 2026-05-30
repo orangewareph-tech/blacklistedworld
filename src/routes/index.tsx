@@ -357,9 +357,10 @@ function Index() {
                 <div className="md:col-span-2">
                   <label className="text-sm font-semibold text-[#ccc] block mb-1">Upload Supporting Evidence</label>
                   <label className="bg-[var(--input-bg)] border-[1.5px] border-dashed border-border rounded-lg p-4 text-center text-[#777] cursor-pointer block transition-all hover:border-[#555] hover:text-[#aaa]">
-                    📁 Contracts, invoices, receipts, screenshots, emails, photos
+                    <span className="inline-flex items-center gap-2"><FolderOpen className="w-4 h-4" strokeWidth={1.5} /> Contracts, invoices, receipts, screenshots, emails, photos</span>
                     <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.eml,.msg" className="hidden" />
                   </label>
+
                 </div>
 
                 <div className="md:col-span-2 flex items-start gap-2 text-xs text-[#bbb]">
