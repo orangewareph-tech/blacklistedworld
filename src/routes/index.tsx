@@ -4,6 +4,7 @@ import { RustCanvas } from "@/components/RustCanvas";
 import { AnimatedStat } from "@/components/AnimatedStat";
 import { IntroLogo } from "@/components/IntroLogo";
 import { useAuth } from "@/hooks/useAuth";
+import { HamburgerMenu } from "@/components/HamburgerMenu";
 import blacklistedLogo from "@/assets/blacklisted-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -118,13 +119,16 @@ function Index() {
           <button onClick={() => scrollTo("privacy-section")} className="hover:text-white transition-colors">Privacy</button>
           {isAdmin && <Link to="/admin" className="hover:text-white transition-colors">Admin</Link>}
         </nav>
-        <div className="flex gap-2.5">
-          {user ? (
-            <button className="bl-btn bl-btn-outline" onClick={() => signOut()}>Log Out</button>
-          ) : (
-            <Link to="/auth" className="bl-btn bl-btn-outline">Log In</Link>
-          )}
-          <button className="bl-btn bl-btn-primary" onClick={() => navigate({ to: user ? "/submit" : "/auth" })}>➕ Submit Report</button>
+        <div className="flex gap-2.5 items-center">
+          <div className="hidden md:flex gap-2.5">
+            {user ? (
+              <button className="bl-btn bl-btn-outline" onClick={() => signOut()}>Log Out</button>
+            ) : (
+              <Link to="/auth" className="bl-btn bl-btn-outline">Log In</Link>
+            )}
+            <button className="bl-btn bl-btn-primary" onClick={() => navigate({ to: user ? "/submit" : "/auth" })}>➕ Submit Report</button>
+          </div>
+          <HamburgerMenu />
         </div>
       </header>
 
