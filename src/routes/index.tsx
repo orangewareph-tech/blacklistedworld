@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { RustCanvas } from "@/components/RustCanvas";
 import { AnimatedStat } from "@/components/AnimatedStat";
 import { IntroLogo } from "@/components/IntroLogo";
-import blacklistedLogo from "@/assets/blacklisted-logo.jpg";
+import blacklistedLogo from "@/assets/blacklisted-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
