@@ -1,8 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
+const searchSchema = z.object({
+  q: z.string().optional(),
+});
+
 export const Route = createFileRoute("/reports")({
+  validateSearch: searchSchema,
   head: () => ({
     meta: [
       { title: "Reports — BlackListed" },
@@ -33,16 +39,21 @@ function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// Sanitize term for PostgREST .or() — commas and parentheses break the filter syntax
+function sanitizeForOr(s: string) {
+  return s.replace(/[,()]/g, " ").trim();
+}
+
 function Highlight({ text, term }: { text: string | null | undefined; term: string }) {
-  if (!text) return <>—</>;
+  if (text === null || text === undefined || text === "") return <>—</>;
   const t = term.trim();
   if (!t) return <>{text}</>;
-  const re = new RegExp(`(${escapeRegExp(t)})`, "ig");
-  const parts = text.split(re);
+  const lower = t.toLowerCase();
+  const parts = text.split(new RegExp(`(${escapeRegExp(t)})`, "i"));
   return (
     <>
       {parts.map((p, i) =>
-        re.test(p) && p.toLowerCase() === t.toLowerCase() ? (
+        p.toLowerCase() === lower ? (
           <mark key={i} className="bg-accent/30 text-white rounded px-0.5">{p}</mark>
         ) : (
           <span key={i}>{p}</span>
@@ -53,27 +64,46 @@ function Highlight({ text, term }: { text: string | null | undefined; term: stri
 }
 
 function ReportsPage() {
-  const [q, setQ] = useState("");
+  const { q: initialQ } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const [q, setQ] = useState(initialQ ?? "");
   const [rows, setRows] = useState<ReportRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Sync URL when user types (debounced)
+  useEffect(() => {
+    const id = setTimeout(() => {
+      navigate({ search: { q: q.trim() || undefined }, replace: true });
+    }, 300);
+    return () => clearTimeout(id);
+  }, [q, navigate]);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
+      setError(null);
       let query = supabase
         .from("reports")
         .select("id,subject_name,alias,email,wallet,website,country,city,category,transaction_type,risk,status,amount_usd,created_at")
         .in("status", ["approved", "resolved"])
         .order("created_at", { ascending: false })
         .limit(100);
-      if (q.trim()) {
-        const term = `%${q.trim()}%`;
+      const safe = sanitizeForOr(q);
+      if (safe) {
+        const term = `%${safe}%`;
         query = query.or(
-          `subject_name.ilike.${term},alias.ilike.${term},email.ilike.${term},wallet.ilike.${term},website.ilike.${term},country.ilike.${term}`
+          `subject_name.ilike.${term},alias.ilike.${term},email.ilike.${term},wallet.ilike.${term},website.ilike.${term},country.ilike.${term},city.ilike.${term}`
         );
       }
-      const { data } = await query;
-      setRows((data as ReportRow[] | null) ?? []);
+      const { data, error } = await query;
+      if (error) {
+        console.error("[reports] search failed", error);
+        setError(error.message);
+        setRows([]);
+      } else {
+        setRows((data as ReportRow[] | null) ?? []);
+      }
       setLoading(false);
     };
     const id = setTimeout(load, 250);
@@ -87,29 +117,35 @@ function ReportsPage() {
       <div className="max-w-5xl mx-auto">
         <Link to="/" className="text-xs text-muted-foreground hover:text-white">← Back</Link>
         <h1 className="text-3xl font-bold mt-3 mb-1">Reports</h1>
-        <p className="text-sm text-muted-foreground mb-6">Search names, companies, wallets, websites, emails or countries.</p>
-        <div className="bl-search mb-6">
+        <p className="text-sm text-muted-foreground mb-6">Search names, companies, wallets, websites, emails, cities or countries.</p>
+        <div className="bl-search mb-2">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search reports…"
+            autoFocus
           />
         </div>
-        {loading ? (
+        <div className="text-xs text-muted-foreground mb-6">
+          {loading ? "Searching…" : `${rows.length} result${rows.length === 1 ? "" : "s"}${term ? ` for "${term}"` : ""}`}
+        </div>
+        {error ? (
+          <p className="text-sm text-red-400">Search error: {error}</p>
+        ) : loading ? (
           <p className="text-muted-foreground">Loading…</p>
         ) : rows.length === 0 ? (
-          <p className="text-muted-foreground">No reports found.</p>
+          <p className="text-muted-foreground">No reports found{term ? ` for "${term}"` : ""}.</p>
         ) : (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {rows.map((r) => {
-              const matchedField =
-                term &&
-                (
-                  (r.alias && r.alias.toLowerCase().includes(term.toLowerCase()) && { label: "Alias", value: r.alias }) ||
-                  (r.wallet && r.wallet.toLowerCase().includes(term.toLowerCase()) && { label: "Wallet", value: r.wallet }) ||
-                  (r.website && r.website.toLowerCase().includes(term.toLowerCase()) && { label: "Website", value: r.website }) ||
-                  (r.email && r.email.toLowerCase().includes(term.toLowerCase()) && { label: "Email", value: r.email })
-                );
+              const lt = term.toLowerCase();
+              const matchedField = !term
+                ? null
+                : (r.alias && r.alias.toLowerCase().includes(lt) && { label: "Alias", value: r.alias }) ||
+                  (r.wallet && r.wallet.toLowerCase().includes(lt) && { label: "Wallet", value: r.wallet }) ||
+                  (r.website && r.website.toLowerCase().includes(lt) && { label: "Website", value: r.website }) ||
+                  (r.email && r.email.toLowerCase().includes(lt) && { label: "Email", value: r.email }) ||
+                  null;
               return (
                 <Link
                   to="/reports/$id"
