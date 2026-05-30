@@ -133,7 +133,7 @@ function ReportDetail() {
                   </div>
                 </div>
               ) : (
-                <button className="bl-btn bl-btn-outline text-xs" onClick={() => setFlagOpen(true)}>🚩 Flag for review</button>
+                <button className="bl-btn bl-btn-outline text-xs inline-flex items-center gap-1.5" onClick={() => setFlagOpen(true)}><Flag className="w-3.5 h-3.5" strokeWidth={1.75} /> Flag for review</button>
               )
             ) : (
               <Link to="/auth" className="text-xs text-[var(--accent-glow)] hover:underline">Sign in to flag this report</Link>
