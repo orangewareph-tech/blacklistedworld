@@ -214,10 +214,6 @@ section::after {
   50%  { opacity: 0.9;  transform: scale(1.08) rotate(1.5deg); }
   100% { opacity: 0.6;  transform: scale(1.02) rotate(-1deg); }
 }
-/* Intro overlay opts out of the rust effect */
-.bl-intro::before, .bl-intro::after {
-  animation: none; filter: none; mix-blend-mode: normal;
-}
 
 .bl-input {
   width: 100%;
