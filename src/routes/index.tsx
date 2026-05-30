@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { RustCanvas } from "@/components/RustCanvas";
 import { AnimatedStat } from "@/components/AnimatedStat";
-import { IntroLogo } from "@/components/IntroLogo";
+
 import { useAuth } from "@/hooks/useAuth";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
