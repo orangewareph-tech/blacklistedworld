@@ -91,6 +91,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           block_reason: string | null
+          blocked_at: string | null
           blocked_until: string | null
           country: string | null
           created_at: string
@@ -107,6 +108,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           block_reason?: string | null
+          blocked_at?: string | null
           blocked_until?: string | null
           country?: string | null
           created_at?: string
@@ -123,6 +125,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           block_reason?: string | null
+          blocked_at?: string | null
           blocked_until?: string | null
           country?: string | null
           created_at?: string
