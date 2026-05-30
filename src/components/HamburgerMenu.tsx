@@ -32,16 +32,16 @@ export function HamburgerMenu() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-[100]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <button
             aria-label="Close menu backdrop"
             onClick={close}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/85 backdrop-blur-md"
           />
           <aside
             role="dialog"
             aria-modal="true"
-            className="absolute right-0 top-0 h-full w-[88%] max-w-sm bg-surface border-l border-border shadow-2xl flex flex-col animate-in slide-in-from-right duration-200"
+            className="relative w-full max-w-md max-h-[90vh] rounded-2xl bg-[#0a0a0a] border border-white/15 shadow-[0_20px_80px_-10px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <span className="text-sm uppercase tracking-[0.18em] text-muted-foreground">Menu</span>
