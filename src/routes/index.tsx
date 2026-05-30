@@ -227,16 +227,19 @@ function Index() {
         <p className="text-center text-muted-foreground mb-8 text-sm">Search before you trust — submit if you've been wronged.</p>
         <div className="grid gap-6 mb-16 grid-cols-1 md:grid-cols-3">
           {[
-            { icon: "🔍", title: "1. Search", text: "Before sending money, signing, or investing — look up names, companies, wallets, IBANs, passports or court cases." },
-            { icon: "📋", title: "2. Review", text: "See independent user reports with risk scores, supporting documents, status flags and rebuttals from the accused." },
-            { icon: "🛡️", title: "3. Decide", text: "Make an informed transaction decision. High risk? Walk away. Clean record? Proceed with proper due diligence." },
+            { Icon: Search, title: "1. Search", text: "Before sending money, signing, or investing — look up names, companies, wallets, IBANs, passports or court cases." },
+            { Icon: ClipboardList, title: "2. Review", text: "See independent user reports with risk scores, supporting documents, status flags and rebuttals from the accused." },
+            { Icon: ShieldCheck, title: "3. Decide", text: "Make an informed transaction decision. High risk? Walk away. Clean record? Proceed with proper due diligence." },
           ].map((s) => (
             <div key={s.title} className="bl-card bl-card-hover p-7 text-center group">
-              <div className="text-4xl mb-3 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">{s.icon}</div>
+              <div className="mb-3 flex justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-0.5">
+                <s.Icon className="w-9 h-9 text-white" strokeWidth={1.25} />
+              </div>
               <h4 className="font-bold mb-1">{s.title}</h4>
               <p className="text-muted-foreground text-sm">{s.text}</p>
             </div>
           ))}
+
         </div>
 
         {/* Categories */}
