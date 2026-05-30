@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { recordAuthFailure } from "@/lib/security.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { CheckCircle2 } from "lucide-react";
+
 
 
 export const Route = createFileRoute("/verify-phone")({
