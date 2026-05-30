@@ -117,7 +117,7 @@ function ReportDetail() {
           <div className="mt-8 pt-6 border-t border-border">
             {user ? (
               flagged ? (
-                <p className="text-sm text-[#a5d6a7]">✅ Thanks — your flag was submitted.</p>
+                <p className="text-sm text-[#a5d6a7] inline-flex items-center gap-2"><CheckCircle2 className="w-4 h-4" strokeWidth={1.75} /> Thanks — your flag was submitted.</p>
               ) : flagOpen ? (
                 <div className="space-y-3">
                   <textarea
