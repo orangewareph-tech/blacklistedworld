@@ -160,17 +160,23 @@ export function RustCanvas() {
   return (
     <canvas
       ref={ref}
-      className="absolute inset-0 w-full h-full z-[1] opacity-[0.48]"
+      className="opacity-[0.48]"
       style={{
-        pointerEvents: "auto",
-        // Confine the rust particles to the area BELOW the hero logo:
-        // fully hidden across the top (logo zone), fading in past ~55%.
+        position: "fixed",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "70vh",
+        zIndex: 0,
+        pointerEvents: "none",
         WebkitMaskImage:
-          "linear-gradient(to bottom, transparent 0%, transparent 52%, rgba(0,0,0,0.55) 64%, #000 78%, #000 100%)",
+          "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 18%, #000 40%, #000 100%)",
         maskImage:
-          "linear-gradient(to bottom, transparent 0%, transparent 52%, rgba(0,0,0,0.55) 64%, #000 78%, #000 100%)",
+          "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 18%, #000 40%, #000 100%)",
       }}
     />
   );
 }
+
 
