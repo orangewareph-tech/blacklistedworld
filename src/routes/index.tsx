@@ -129,7 +129,7 @@ function Index() {
             ) : (
               <Link to="/auth" className="bl-btn bl-btn-outline">Log In</Link>
             )}
-            <button className="bl-btn bl-btn-primary" onClick={() => navigate({ to: user ? "/submit" : "/auth" })}>➕ Submit Report</button>
+            <button className="bl-btn bl-btn-primary inline-flex items-center gap-1.5" onClick={() => navigate({ to: user ? "/submit" : "/auth" })}><Plus className="w-4 h-4" strokeWidth={1.75} /> Submit Report</button>
           </div>
           <HamburgerMenu />
         </div>
