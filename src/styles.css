@@ -155,16 +155,68 @@
 }
 
 .bl-card {
+  position: relative;
   background: var(--gradient-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-inset-top);
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+  isolation: isolate;
 }
 .bl-card-hover:hover {
   border-color: var(--border-strong);
   transform: translateY(-4px);
   box-shadow: var(--shadow-elevated);
+}
+
+/* ===== Rust / corrosion animation =====
+   Applied to every section and .bl-card. A drifting SVG turbulence
+   noise layer (iron-oxide grain) sits beneath slow-pulsing patina
+   blooms, evoking rust creeping across oxidized metal. */
+section { position: relative; isolation: isolate; }
+.bl-card::before,
+.bl-card::after,
+section::before,
+section::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 0;
+}
+.bl-card > *,
+section > * { position: relative; z-index: 1; }
+.bl-card::before,
+section::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='r'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.18  0 0 0 0 0.06  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23r)'/></svg>");
+  background-size: 320px 320px;
+  mix-blend-mode: screen;
+  opacity: 0.18;
+  animation: bl-rust-drift 28s linear infinite;
+}
+.bl-card::after,
+section::after {
+  background:
+    radial-gradient(circle at 18% 22%, oklch(0.52 0.18 38 / 0.35) 0%, transparent 35%),
+    radial-gradient(circle at 82% 70%, oklch(0.45 0.16 28 / 0.32) 0%, transparent 40%),
+    radial-gradient(circle at 50% 95%, oklch(0.38 0.12 22 / 0.28) 0%, transparent 45%);
+  mix-blend-mode: overlay;
+  filter: blur(8px);
+  animation: bl-rust-bloom 14s ease-in-out infinite alternate;
+}
+@keyframes bl-rust-drift {
+  from { background-position: 0 0; }
+  to   { background-position: 320px 320px; }
+}
+@keyframes bl-rust-bloom {
+  0%   { opacity: 0.55; transform: scale(1) rotate(0deg); }
+  50%  { opacity: 0.9;  transform: scale(1.08) rotate(1.5deg); }
+  100% { opacity: 0.6;  transform: scale(1.02) rotate(-1deg); }
+}
+/* Intro overlay opts out of the rust effect */
+.bl-intro::before, .bl-intro::after {
+  animation: none; filter: none; mix-blend-mode: normal;
 }
 
 .bl-input {
