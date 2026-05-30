@@ -192,7 +192,7 @@ function Index() {
               <div className="bg-[rgba(255,179,0,0.06)] border border-[rgba(255,179,0,0.2)] rounded-lg p-4 text-xs text-[#bbb] text-center">
                 ⚠️ <strong className="text-[var(--amber)]">Legal Warning:</strong> By submitting this report, you certify that the information is true and accurate to the best of your knowledge. Filing a false report may result in legal consequences. All reports are moderated before publication.
               </div>
-              <button type="submit" className="bl-btn-primary w-full py-3 text-base">🛡️ Submit Report for Review</button>
+              <button type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">🛡️ Submit Report for Review</button>
             </form>
           ) : (
             <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
