@@ -108,7 +108,7 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
-      <IntroLogo />
+      
       <div className="grain-overlay" aria-hidden />
 
       {/* Header */}
