@@ -215,9 +215,10 @@ function SubmitPage() {
                 </div>
               </div>
               {err && <p className="text-sm text-[var(--accent)]">{err}</p>}
-              <button disabled={busy || !captchaToken} type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">
-                {busy ? "Submitting…" : "🛡️ Submit Report for Review"}
+              <button disabled={busy || !captchaToken} type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base inline-flex items-center justify-center gap-2">
+                {busy ? "Submitting…" : (<><ShieldCheck className="w-4 h-4" strokeWidth={1.5} /> Submit Report for Review</>)}
               </button>
+
             </form>
           )}
         </div>
