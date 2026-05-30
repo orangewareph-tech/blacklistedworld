@@ -1,32 +1,34 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function IntroLogo() {
+  const { user } = useAuth();
   const [stage, setStage] = useState<"in" | "out" | "done">("in");
 
   useEffect(() => {
-    if (sessionStorage.getItem("bl-intro-seen")) {
+    // Skip if already seen, or user is logged in
+    if (localStorage.getItem("bl-intro-seen") || user) {
       setStage("done");
+      localStorage.setItem("bl-intro-seen", "1");
       return;
     }
     const tOut = setTimeout(() => setStage("out"), 4400);
     const tDone = setTimeout(() => {
       setStage("done");
-      sessionStorage.setItem("bl-intro-seen", "1");
+      localStorage.setItem("bl-intro-seen", "1");
     }, 5000);
     return () => {
       clearTimeout(tOut);
       clearTimeout(tDone);
     };
-  }, []);
+  }, [user]);
 
   if (stage === "done") return null;
 
   const skip = () => {
+    localStorage.setItem("bl-intro-seen", "1");
     setStage("out");
-    setTimeout(() => {
-      setStage("done");
-      sessionStorage.setItem("bl-intro-seen", "1");
-    }, 500);
+    setTimeout(() => setStage("done"), 500);
   };
 
   return (
