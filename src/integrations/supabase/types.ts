@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      pre_assessments: {
+        Row: {
+          admin_notes: string | null
+          alias: string | null
+          amount_usd: number | null
+          city: string | null
+          country: string | null
+          created_at: string
+          description: string
+          email: string | null
+          id: string
+          industry: string | null
+          phone: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          social: string | null
+          status: Database["public"]["Enums"]["report_status"]
+          subject_name: string
+          submitter_id: string
+          ticket_number: string | null
+          transaction_type: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          alias?: string | null
+          amount_usd?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description: string
+          email?: string | null
+          id?: string
+          industry?: string | null
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          social?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          subject_name: string
+          submitter_id: string
+          ticket_number?: string | null
+          transaction_type: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          alias?: string | null
+          amount_usd?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string
+          email?: string | null
+          id?: string
+          industry?: string | null
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          social?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          subject_name?: string
+          submitter_id?: string
+          ticket_number?: string | null
+          transaction_type?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -21,10 +93,13 @@ export type Database = {
           country: string | null
           created_at: string
           display_name: string | null
+          email_verified_at: string | null
           id: string
           is_verified: boolean
           phone: string | null
+          phone_verified_at: string | null
           updated_at: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -32,10 +107,13 @@ export type Database = {
           country?: string | null
           created_at?: string
           display_name?: string | null
+          email_verified_at?: string | null
           id: string
           is_verified?: boolean
           phone?: string | null
+          phone_verified_at?: string | null
           updated_at?: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -43,10 +121,13 @@ export type Database = {
           country?: string | null
           created_at?: string
           display_name?: string | null
+          email_verified_at?: string | null
           id?: string
           is_verified?: boolean
           phone?: string | null
+          phone_verified_at?: string | null
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -157,6 +238,7 @@ export type Database = {
           status: Database["public"]["Enums"]["report_status"]
           subject_name: string
           submitter_id: string | null
+          ticket_number: string | null
           transaction_type: string
           updated_at: string
           wallet: string | null
@@ -189,6 +271,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["report_status"]
           subject_name: string
           submitter_id?: string | null
+          ticket_number?: string | null
           transaction_type: string
           updated_at?: string
           wallet?: string | null
@@ -221,6 +304,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["report_status"]
           subject_name?: string
           submitter_id?: string | null
+          ticket_number?: string | null
           transaction_type?: string
           updated_at?: string
           wallet?: string | null
@@ -254,6 +338,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_ticket_number: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
