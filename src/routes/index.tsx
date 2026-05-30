@@ -206,9 +206,10 @@ function Index() {
             Example: AB123*** · 0xA1b2...c9f0 · INV-2025-0418 · goldline-trading.com
           </p>
         </div>
-        <div className="absolute bottom-3 right-5 text-[0.65rem] text-[var(--text-muted)] z-20 pointer-events-none tracking-[0.15em] uppercase">
-          🦀 Rust Network
+        <div className="absolute bottom-3 right-5 text-[0.65rem] text-[var(--text-muted)] z-20 pointer-events-none tracking-[0.15em] uppercase inline-flex items-center gap-1.5">
+          <Network className="w-3 h-3" strokeWidth={1.75} /> Rust Network
         </div>
+
       </section>
 
       {/* Stats */}
