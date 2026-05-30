@@ -423,7 +423,7 @@ function Index() {
         {/* Right of Reply + Removal Policy */}
         <div className="grid gap-5 mb-10 grid-cols-1 md:grid-cols-2">
           <div className="bl-card p-6">
-            <h3 className="text-lg font-bold mb-2">🗣️ Right of Reply</h3>
+            <h3 className="text-lg font-bold mb-2 inline-flex items-center gap-2"><MessageCircle className="w-4 h-4 text-white" strokeWidth={1.5} /> Right of Reply</h3>
             <p className="text-sm text-muted-foreground">
               Any individual or organization identified in a report may submit a response, correction, clarification, or rebuttal. Verified responses are published alongside the original report so readers see both sides.
             </p>
