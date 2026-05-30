@@ -6,6 +6,8 @@ import { Turnstile } from "@/components/Turnstile";
 import { RequireVerifiedEmail } from "@/components/RequireVerifiedEmail";
 import { verifyTurnstile } from "@/lib/security.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { FileText, CheckCircle2, FolderOpen, ShieldCheck } from "lucide-react";
+
 
 export const Route = createFileRoute("/submit")({
   head: () => ({
@@ -121,7 +123,7 @@ function SubmitPage() {
       <div className="max-w-3xl mx-auto">
         <Link to="/" className="text-xs text-muted-foreground hover:text-white">← Back</Link>
         <div className="bl-card p-8 md:p-10 mt-3">
-          <h1 className="text-center text-2xl font-bold mb-1">📝 Submit Your Experience</h1>
+          <h1 className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><FileText className="w-5 h-5 text-white" strokeWidth={1.5} /> Submit Your Experience</h1>
           <p className="text-center text-muted-foreground mb-2 text-sm">
             Free of charge. <strong className="text-foreground">All submissions reviewed by admins before publication.</strong>
           </p>
@@ -131,8 +133,9 @@ function SubmitPage() {
 
           {done ? (
             <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
-              ✅ <strong>Report submitted for review.</strong>
+              <div className="inline-flex items-center gap-2 justify-center"><CheckCircle2 className="w-4 h-4" strokeWidth={1.75} /> <strong>Report submitted for review.</strong></div>
               <div className="mt-3 text-foreground">
+
                 Your ticket number:
                 <div className="text-2xl font-mono font-bold mt-1 tracking-wider">{done.ticket}</div>
               </div>
@@ -196,8 +199,9 @@ function SubmitPage() {
                 <div className="md:col-span-2">
                   <label className="text-sm font-semibold text-[#ccc] block mb-1">Upload Evidence</label>
                   <label className="bg-[var(--input-bg)] border-[1.5px] border-dashed border-border rounded-lg p-4 text-center text-[#777] cursor-pointer block transition-all hover:border-[#555] hover:text-[#aaa]">
-                    📁 Contracts, invoices, receipts, screenshots, emails
+                    <span className="inline-flex items-center gap-2"><FolderOpen className="w-4 h-4" strokeWidth={1.5} /> Contracts, invoices, receipts, screenshots, emails</span>
                     <input name="files" type="file" multiple accept="image/*,.pdf,.doc,.docx,.eml,.msg" className="hidden" />
+
                   </label>
                 </div>
                 <div className="md:col-span-2 flex items-start gap-2 text-xs text-[#bbb]">
@@ -211,9 +215,10 @@ function SubmitPage() {
                 </div>
               </div>
               {err && <p className="text-sm text-[var(--accent)]">{err}</p>}
-              <button disabled={busy || !captchaToken} type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">
-                {busy ? "Submitting…" : "🛡️ Submit Report for Review"}
+              <button disabled={busy || !captchaToken} type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base inline-flex items-center justify-center gap-2">
+                {busy ? "Submitting…" : (<><ShieldCheck className="w-4 h-4" strokeWidth={1.5} /> Submit Report for Review</>)}
               </button>
+
             </form>
           )}
         </div>

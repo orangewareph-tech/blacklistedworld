@@ -2,6 +2,8 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { CheckCircle2, Flag } from "lucide-react";
+
 
 export const Route = createFileRoute("/reports/$id")({
   component: ReportDetail,
@@ -115,7 +117,7 @@ function ReportDetail() {
           <div className="mt-8 pt-6 border-t border-border">
             {user ? (
               flagged ? (
-                <p className="text-sm text-[#a5d6a7]">✅ Thanks — your flag was submitted.</p>
+                <p className="text-sm text-[#a5d6a7] inline-flex items-center gap-2"><CheckCircle2 className="w-4 h-4" strokeWidth={1.75} /> Thanks — your flag was submitted.</p>
               ) : flagOpen ? (
                 <div className="space-y-3">
                   <textarea
@@ -131,7 +133,7 @@ function ReportDetail() {
                   </div>
                 </div>
               ) : (
-                <button className="bl-btn bl-btn-outline text-xs" onClick={() => setFlagOpen(true)}>🚩 Flag for review</button>
+                <button className="bl-btn bl-btn-outline text-xs inline-flex items-center gap-1.5" onClick={() => setFlagOpen(true)}><Flag className="w-3.5 h-3.5" strokeWidth={1.75} /> Flag for review</button>
               )
             ) : (
               <Link to="/auth" className="text-xs text-[var(--accent-glow)] hover:underline">Sign in to flag this report</Link>

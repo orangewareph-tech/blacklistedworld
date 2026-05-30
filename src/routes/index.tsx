@@ -6,7 +6,7 @@ import { IntroLogo } from "@/components/IntroLogo";
 import { useAuth } from "@/hooks/useAuth";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, Plus, Search, Network, ClipboardList, ShieldCheck, AlertTriangle, Calendar, Paperclip, Users, FileText, FolderOpen, CheckCircle2, Scale, MessageCircle, Brush, Lock, Flag, Camera } from "lucide-react";
 import blacklistedLogo from "@/assets/blacklisted-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -129,7 +129,7 @@ function Index() {
             ) : (
               <Link to="/auth" className="bl-btn bl-btn-outline">Log In</Link>
             )}
-            <button className="bl-btn bl-btn-primary" onClick={() => navigate({ to: user ? "/submit" : "/auth" })}>➕ Submit Report</button>
+            <button className="bl-btn bl-btn-primary inline-flex items-center gap-1.5" onClick={() => navigate({ to: user ? "/submit" : "/auth" })}><Plus className="w-4 h-4" strokeWidth={1.75} /> Submit Report</button>
           </div>
           <HamburgerMenu />
         </div>
@@ -183,9 +183,10 @@ function Index() {
               onChange={(e) => setHeroQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") runHeroSearch(); }}
             />
-            <button className="bl-btn bl-btn-primary" onClick={runHeroSearch}>
-              🔍 Search
+            <button className="bl-btn bl-btn-primary inline-flex items-center gap-1.5" onClick={runHeroSearch}>
+              <Search className="w-4 h-4" strokeWidth={1.75} /> Search
             </button>
+
           </div>
 
           <button
@@ -205,9 +206,10 @@ function Index() {
             Example: AB123*** · 0xA1b2...c9f0 · INV-2025-0418 · goldline-trading.com
           </p>
         </div>
-        <div className="absolute bottom-3 right-5 text-[0.65rem] text-[var(--text-muted)] z-20 pointer-events-none tracking-[0.15em] uppercase">
-          🦀 Rust Network
+        <div className="absolute bottom-3 right-5 text-[0.65rem] text-[var(--text-muted)] z-20 pointer-events-none tracking-[0.15em] uppercase inline-flex items-center gap-1.5">
+          <Network className="w-3 h-3" strokeWidth={1.75} /> Rust Network
         </div>
+
       </section>
 
       {/* Stats */}
@@ -225,16 +227,19 @@ function Index() {
         <p className="text-center text-muted-foreground mb-8 text-sm">Search before you trust — submit if you've been wronged.</p>
         <div className="grid gap-6 mb-16 grid-cols-1 md:grid-cols-3">
           {[
-            { icon: "🔍", title: "1. Search", text: "Before sending money, signing, or investing — look up names, companies, wallets, IBANs, passports or court cases." },
-            { icon: "📋", title: "2. Review", text: "See independent user reports with risk scores, supporting documents, status flags and rebuttals from the accused." },
-            { icon: "🛡️", title: "3. Decide", text: "Make an informed transaction decision. High risk? Walk away. Clean record? Proceed with proper due diligence." },
+            { Icon: Search, title: "1. Search", text: "Before sending money, signing, or investing — look up names, companies, wallets, IBANs, passports or court cases." },
+            { Icon: ClipboardList, title: "2. Review", text: "See independent user reports with risk scores, supporting documents, status flags and rebuttals from the accused." },
+            { Icon: ShieldCheck, title: "3. Decide", text: "Make an informed transaction decision. High risk? Walk away. Clean record? Proceed with proper due diligence." },
           ].map((s) => (
             <div key={s.title} className="bl-card bl-card-hover p-7 text-center group">
-              <div className="text-4xl mb-3 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">{s.icon}</div>
+              <div className="mb-3 flex justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-0.5">
+                <s.Icon className="w-9 h-9 text-white" strokeWidth={1.25} />
+              </div>
               <h4 className="font-bold mb-1">{s.title}</h4>
               <p className="text-muted-foreground text-sm">{s.text}</p>
             </div>
           ))}
+
         </div>
 
         {/* Categories */}
@@ -247,7 +252,7 @@ function Index() {
         </div>
 
         {/* Recent Reports */}
-        <h2 id="reports-section" className="text-center text-2xl font-bold mb-1">⚠️ Recent Community Reports</h2>
+        <h2 id="reports-section" className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><AlertTriangle className="w-5 h-5 text-white" strokeWidth={1.5} /> Recent Community Reports</h2>
         <p className="text-center text-muted-foreground mb-8 text-sm">Independent user submissions. All identifiers are partially masked to protect privacy.</p>
         <div className="grid gap-5 mb-16 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {reports.map((r) => {
@@ -268,10 +273,11 @@ function Index() {
                 ))}
                 <p className="text-[#bbb] text-sm mt-2 line-clamp-3">{r.excerpt}</p>
                 <div className="mt-4 text-xs text-[#666] flex justify-between border-t border-border pt-3">
-                  <span>📅 {r.when}</span>
-                  <span>📎 {r.evidence} files</span>
-                  <span>👥 {r.reportsCount} reports</span>
+                  <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3" strokeWidth={1.75} /> {r.when}</span>
+                  <span className="inline-flex items-center gap-1"><Paperclip className="w-3 h-3" strokeWidth={1.75} /> {r.evidence} files</span>
+                  <span className="inline-flex items-center gap-1"><Users className="w-3 h-3" strokeWidth={1.75} /> {r.reportsCount} reports</span>
                 </div>
+
               </div>
             );
           })}
@@ -279,7 +285,7 @@ function Index() {
 
         {/* Submit Report */}
         <div id="submit-section" className="bl-card p-8 md:p-10 mb-16 max-w-[760px] mx-auto">
-          <h2 className="text-center text-2xl font-bold mb-1">📝 Submit Your Experience</h2>
+          <h2 className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><FileText className="w-5 h-5 text-white" strokeWidth={1.5} /> Submit Your Experience</h2>
           <p className="text-center text-muted-foreground mb-2 text-sm">
             Free of charge. <strong className="text-foreground">Email and phone verification required before publication.</strong>
           </p>
@@ -351,9 +357,10 @@ function Index() {
                 <div className="md:col-span-2">
                   <label className="text-sm font-semibold text-[#ccc] block mb-1">Upload Supporting Evidence</label>
                   <label className="bg-[var(--input-bg)] border-[1.5px] border-dashed border-border rounded-lg p-4 text-center text-[#777] cursor-pointer block transition-all hover:border-[#555] hover:text-[#aaa]">
-                    📁 Contracts, invoices, receipts, screenshots, emails, photos
+                    <span className="inline-flex items-center gap-2"><FolderOpen className="w-4 h-4" strokeWidth={1.5} /> Contracts, invoices, receipts, screenshots, emails, photos</span>
                     <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.eml,.msg" className="hidden" />
                   </label>
+
                 </div>
 
                 <div className="md:col-span-2 flex items-start gap-2 text-xs text-[#bbb]">
@@ -363,15 +370,17 @@ function Index() {
                   </label>
                 </div>
               </div>
-              <div className="bg-[rgba(255,179,0,0.06)] border border-[rgba(255,179,0,0.2)] rounded-lg p-4 text-xs text-[#bbb] text-center">
-                ⚠️ <strong className="text-[var(--amber)]">Legal Notice:</strong> The submitter is solely responsible for the accuracy and legality of the information. False, defamatory, or malicious reports may result in account termination and legal action.
+              <div className="bg-[rgba(255,179,0,0.06)] border border-[rgba(255,179,0,0.2)] rounded-lg p-4 text-xs text-[#bbb] text-center inline-flex items-start gap-2 w-full">
+                <AlertTriangle className="w-4 h-4 text-[var(--amber)] flex-shrink-0 mt-0.5" strokeWidth={1.5} />
+                <span><strong className="text-[var(--amber)]">Legal Notice:</strong> The submitter is solely responsible for the accuracy and legality of the information. False, defamatory, or malicious reports may result in account termination and legal action.</span>
               </div>
-              <button type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">🛡️ Submit Report for Review</button>
+              <button type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base inline-flex items-center justify-center gap-2"><ShieldCheck className="w-4 h-4" strokeWidth={1.5} /> Submit Report for Review</button>
             </form>
           ) : (
-            <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
-              ✅ <strong>Report Submitted.</strong> You'll receive an email and SMS verification link. After verification, our moderators will review within 24–72 hours.
+            <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7] inline-flex items-start gap-2 justify-center w-full">
+              <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" strokeWidth={1.75} /> <span><strong>Report Submitted.</strong> You'll receive an email and SMS verification link. After verification, our moderators will review within 24–72 hours.</span>
             </div>
+
           )}
         </div>
 
@@ -395,7 +404,7 @@ function Index() {
 
         {/* Legal Notice */}
         <div id="legal-section" className="bl-card p-7 md:p-9 mb-10">
-          <h2 className="text-xl font-bold mb-3">⚖️ Important Legal Notice</h2>
+          <h2 className="text-xl font-bold mb-3 inline-flex items-center gap-2"><Scale className="w-5 h-5 text-white" strokeWidth={1.5} /> Important Legal Notice</h2>
           <p className="text-sm text-muted-foreground mb-3">
             All reports published on this website are submitted by independent users. The submitter is <strong className="text-foreground">solely and exclusively responsible</strong> for the accuracy, truthfulness, legality, and completeness of any information provided.
           </p>
@@ -414,13 +423,13 @@ function Index() {
         {/* Right of Reply + Removal Policy */}
         <div className="grid gap-5 mb-10 grid-cols-1 md:grid-cols-2">
           <div className="bl-card p-6">
-            <h3 className="text-lg font-bold mb-2">🗣️ Right of Reply</h3>
+            <h3 className="text-lg font-bold mb-2 inline-flex items-center gap-2"><MessageCircle className="w-4 h-4 text-white" strokeWidth={1.5} /> Right of Reply</h3>
             <p className="text-sm text-muted-foreground">
               Any individual or organization identified in a report may submit a response, correction, clarification, or rebuttal. Verified responses are published alongside the original report so readers see both sides.
             </p>
           </div>
           <div className="bl-card p-6">
-            <h3 className="text-lg font-bold mb-2">🧹 Review & Removal Policy</h3>
+            <h3 className="text-lg font-bold mb-2 inline-flex items-center gap-2"><Brush className="w-4 h-4 text-white" strokeWidth={1.5} /> Review & Removal Policy</h3>
             <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
               <li>Reject submissions or edit for compliance.</li>
               <li>Remove abusive, duplicate, or unsupported content.</li>
@@ -432,7 +441,7 @@ function Index() {
 
         {/* Privacy */}
         <div id="privacy-section" className="bl-card p-7 md:p-9 mb-16">
-          <h2 className="text-xl font-bold mb-3">🔐 Privacy Protection</h2>
+          <h2 className="text-xl font-bold mb-3 inline-flex items-center gap-2"><Lock className="w-5 h-5 text-white" strokeWidth={1.5} /> Privacy Protection</h2>
           <p className="text-sm text-muted-foreground mb-3">
             To protect privacy and comply with data protection laws, the following identifiers are <strong className="text-foreground">always partially masked</strong> before publication:
           </p>
@@ -455,20 +464,21 @@ function Index() {
         </div>
 
         {/* Safety Center */}
-        <h2 className="text-center text-2xl font-bold mb-1">🛡️ Safety Center</h2>
+        <h2 className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><ShieldCheck className="w-5 h-5 text-white" strokeWidth={1.5} /> Safety Center</h2>
         <p className="text-center text-muted-foreground mb-8 text-sm">Practical steps for safer transactions.</p>
         <div className="grid gap-5 mb-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {[
-            { title: "🔍 Always Search First", text: "Run names, companies, wallets and IBANs through BlackListed before sending funds or signing." },
-            { title: "🚩 Know the Red Flags", text: "Guaranteed returns, urgency, off-platform payment, crypto-only deals, refusal to KYC — classic risk signals." },
-            { title: "📸 Keep Evidence", text: "Preserve contracts, invoices, chats and receipts. Originals strengthen reports and recovery efforts." },
-            { title: "⚖️ Dispute or Reply", text: "Named in a report? Submit a rebuttal with evidence at disputes@blacklisted.com — verified replies are published." },
+            { Icon: Search, title: "Always Search First", text: "Run names, companies, wallets and IBANs through BlackListed before sending funds or signing." },
+            { Icon: Flag, title: "Know the Red Flags", text: "Guaranteed returns, urgency, off-platform payment, crypto-only deals, refusal to KYC — classic risk signals." },
+            { Icon: Camera, title: "Keep Evidence", text: "Preserve contracts, invoices, chats and receipts. Originals strengthen reports and recovery efforts." },
+            { Icon: Scale, title: "Dispute or Reply", text: "Named in a report? Submit a rebuttal with evidence at disputes@blacklisted.com — verified replies are published." },
           ].map((c) => (
             <div key={c.title} className="bl-card p-5 hover:border-[#444] hover:-translate-y-0.5 transition-all">
-              <h4 className="font-bold mb-1">{c.title}</h4>
+              <h4 className="font-bold mb-1 inline-flex items-center gap-2"><c.Icon className="w-4 h-4 text-white" strokeWidth={1.5} /> {c.title}</h4>
               <p className="text-muted-foreground text-sm">{c.text}</p>
             </div>
           ))}
+
         </div>
       </div>
 

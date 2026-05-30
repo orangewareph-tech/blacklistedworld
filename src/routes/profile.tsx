@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { Check } from "lucide-react";
+
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -332,9 +334,10 @@ function VerificationCard({
       <div className="flex items-center justify-between">
         <div>
           <div className="text-xs text-muted-foreground">{label}</div>
-          <div className={`text-sm font-semibold ${ok ? "text-emerald-400" : "text-foreground"}`}>
-            {ok ? `✓ ${okText}` : "Not verified"}
+          <div className={`text-sm font-semibold ${ok ? "text-emerald-400" : "text-foreground"} inline-flex items-center gap-1.5`}>
+            {ok ? (<><Check className="w-3.5 h-3.5" strokeWidth={2} /> {okText}</>) : "Not verified"}
           </div>
+
         </div>
         {action}
       </div>
