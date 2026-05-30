@@ -31,6 +31,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [signedUp, setSignedUp] = useState(false);
   const verifyToken = useServerFn(verifyTurnstile);
+  const recordFail = useServerFn(recordAuthFailure);
+
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
