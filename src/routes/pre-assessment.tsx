@@ -93,15 +93,16 @@ function PreAssessmentPage() {
       <div className="max-w-2xl mx-auto">
         <Link to="/" className="text-xs text-muted-foreground hover:text-white">← Back</Link>
         <div className="bl-card p-8 md:p-10 mt-3">
-          <h1 className="text-center text-2xl font-bold mb-1">🔍 Pre-Assessment Request</h1>
+          <h1 className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><Search className="w-5 h-5 text-white" strokeWidth={1.5} /> Pre-Assessment Request</h1>
           <p className="text-center text-muted-foreground mb-8 text-sm">
             Check a person or entity <strong className="text-foreground">before</strong> entering into a transaction.
           </p>
 
           {done ? (
             <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
-              ✅ <strong>Pre-assessment submitted.</strong>
+              <div className="inline-flex items-center gap-2 justify-center"><CheckCircle2 className="w-4 h-4" strokeWidth={1.75} /> <strong>Pre-assessment submitted.</strong></div>
               <div className="mt-3 text-foreground">
+
                 Your ticket number:
                 <div className="text-2xl font-mono font-bold mt-1 tracking-wider">{done.ticket}</div>
               </div>
