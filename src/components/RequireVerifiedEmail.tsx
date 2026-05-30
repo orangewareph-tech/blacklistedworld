@@ -3,50 +3,51 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useServerFn } from "@tanstack/react-start";
 import { getBlockStatus } from "@/lib/security.functions";
+import { BlockedNotice } from "@/components/BlockedNotice";
+
+type BlockState = {
+  blocked: boolean;
+  blockedAt: string | null;
+  blockedUntil: string | null;
+  reason: string | null;
+  recentEvents: Array<{ type: string; at: string }>;
+};
 
 export function RequireVerifiedEmail({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [block, setBlock] = useState<{ blocked: boolean; until: string | null; reason: string | null } | null>(null);
+  const [block, setBlock] = useState<BlockState | null>(null);
   const checkBlock = useServerFn(getBlockStatus);
 
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    (async () => {
+    const refresh = async () => {
       const r = await checkBlock({ data: { userId: user.id } });
-      if (!cancelled) setBlock({ blocked: r.blocked, until: r.blockedUntil, reason: r.reason });
-    })();
-    return () => { cancelled = true; };
+      if (!cancelled) setBlock(r as BlockState);
+    };
+    refresh();
+    // Re-check every 30s so the UI auto-recovers when the cooldown ends.
+    const id = setInterval(refresh, 30000);
+    return () => { cancelled = true; clearInterval(id); };
   }, [user, checkBlock]);
 
   if (loading) return null;
   if (!user) return <>{children}</>;
 
   if (block?.blocked) {
-    const until = block.until ? new Date(block.until).toLocaleString() : "soon";
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
-        <div className="bl-card max-w-md w-full p-8 text-center border-[var(--accent)]/40">
-          <h1 className="text-xl font-bold mb-2 text-[var(--accent)]">Account temporarily blocked</h1>
-          <p className="text-sm text-muted-foreground mb-2">
-            Your account has been automatically suspended due to suspicious activity.
-          </p>
-          {block.reason && (
-            <p className="text-xs text-muted-foreground mb-4 italic">{block.reason}</p>
-          )}
-          <p className="text-sm text-muted-foreground">
-            Submissions are disabled until <strong>{until}</strong>.
-          </p>
-          <p className="text-xs text-muted-foreground mt-4">
-            If you believe this is a mistake, contact support.
-          </p>
-        </div>
-      </div>
+      <BlockedNotice
+        blockedAt={block.blockedAt}
+        blockedUntil={block.blockedUntil}
+        reason={block.reason}
+        recentEvents={block.recentEvents}
+      />
     );
   }
+
 
   const confirmed = !!user.email_confirmed_at;
   if (confirmed) return <>{children}</>;
