@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { RustCanvas } from "@/components/RustCanvas";
 import { AnimatedStat } from "@/components/AnimatedStat";
 import { IntroLogo } from "@/components/IntroLogo";
+import { useAuth } from "@/hooks/useAuth";
 import blacklistedLogo from "@/assets/blacklisted-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -87,6 +88,8 @@ const reportCategories = [
 function Index() {
   const [submitted, setSubmitted] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
+  const navigate = useNavigate();
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
@@ -105,14 +108,18 @@ function Index() {
           <img src={blacklistedLogo} alt="BlackListed" className="h-9 md:h-10 w-auto drop-shadow-[0_2px_8px_rgba(229,57,53,0.5)]" />
         </a>
         <nav className="hidden lg:flex items-center gap-6 text-sm text-muted-foreground">
-          <button onClick={() => scrollTo("search-section")} className="hover:text-white transition-colors">Search</button>
-          <button onClick={() => scrollTo("reports-section")} className="hover:text-white transition-colors">Reports</button>
+          <Link to="/reports" className="hover:text-white transition-colors">Reports</Link>
           <button onClick={() => scrollTo("legal-section")} className="hover:text-white transition-colors">Legal Notice</button>
           <button onClick={() => scrollTo("privacy-section")} className="hover:text-white transition-colors">Privacy</button>
+          {isAdmin && <Link to="/admin" className="hover:text-white transition-colors">Admin</Link>}
         </nav>
         <div className="flex gap-2.5">
-          <button className="bl-btn bl-btn-outline" onClick={() => alert("🔒 Login / Sign Up — Coming soon.")}>Log In</button>
-          <button className="bl-btn bl-btn-primary" onClick={() => scrollTo("submit-section")}>➕ Submit Report</button>
+          {user ? (
+            <button className="bl-btn bl-btn-outline" onClick={() => signOut()}>Log Out</button>
+          ) : (
+            <Link to="/auth" className="bl-btn bl-btn-outline">Log In</Link>
+          )}
+          <button className="bl-btn bl-btn-primary" onClick={() => navigate({ to: user ? "/submit" : "/auth" })}>➕ Submit Report</button>
         </div>
       </header>
 
