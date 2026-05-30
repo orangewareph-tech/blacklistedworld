@@ -88,12 +88,17 @@ const reportCategories = [
 function Index() {
   const [submitted, setSubmitted] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [heroQuery, setHeroQuery] = useState("");
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
+  const runHeroSearch = () => {
+    navigate({ to: "/reports", search: { q: heroQuery.trim() || undefined } });
+  };
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
   };
+
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
