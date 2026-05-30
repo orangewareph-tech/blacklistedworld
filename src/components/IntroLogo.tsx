@@ -38,11 +38,11 @@ export function IntroLogo() {
       markIntroSeen();
       return;
     }
-    const tOut = setTimeout(() => setStage("out"), 4400);
+    const tOut = setTimeout(() => setStage("out"), 2600);
     const tDone = setTimeout(() => {
       setStage("done");
       markIntroSeen();
-    }, 5000);
+    }, 3000);
     return () => {
       clearTimeout(tOut);
       clearTimeout(tDone);
