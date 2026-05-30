@@ -273,10 +273,11 @@ function Index() {
                 ))}
                 <p className="text-[#bbb] text-sm mt-2 line-clamp-3">{r.excerpt}</p>
                 <div className="mt-4 text-xs text-[#666] flex justify-between border-t border-border pt-3">
-                  <span>📅 {r.when}</span>
-                  <span>📎 {r.evidence} files</span>
-                  <span>👥 {r.reportsCount} reports</span>
+                  <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3" strokeWidth={1.75} /> {r.when}</span>
+                  <span className="inline-flex items-center gap-1"><Paperclip className="w-3 h-3" strokeWidth={1.75} /> {r.evidence} files</span>
+                  <span className="inline-flex items-center gap-1"><Users className="w-3 h-3" strokeWidth={1.75} /> {r.reportsCount} reports</span>
                 </div>
+
               </div>
             );
           })}
