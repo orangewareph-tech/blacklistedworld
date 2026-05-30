@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { RustCanvas } from "@/components/RustCanvas";
 import { AnimatedStat } from "@/components/AnimatedStat";
+import { IntroLogo } from "@/components/IntroLogo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,6 +50,7 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
+      <IntroLogo />
       <div className="grain-overlay" aria-hidden />
 
       {/* Header */}
