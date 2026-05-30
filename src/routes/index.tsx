@@ -464,20 +464,21 @@ function Index() {
         </div>
 
         {/* Safety Center */}
-        <h2 className="text-center text-2xl font-bold mb-1">🛡️ Safety Center</h2>
+        <h2 className="text-center text-2xl font-bold mb-1 inline-flex items-center justify-center gap-2 w-full"><ShieldCheck className="w-5 h-5 text-white" strokeWidth={1.5} /> Safety Center</h2>
         <p className="text-center text-muted-foreground mb-8 text-sm">Practical steps for safer transactions.</p>
         <div className="grid gap-5 mb-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {[
-            { title: "🔍 Always Search First", text: "Run names, companies, wallets and IBANs through BlackListed before sending funds or signing." },
-            { title: "🚩 Know the Red Flags", text: "Guaranteed returns, urgency, off-platform payment, crypto-only deals, refusal to KYC — classic risk signals." },
-            { title: "📸 Keep Evidence", text: "Preserve contracts, invoices, chats and receipts. Originals strengthen reports and recovery efforts." },
-            { title: "⚖️ Dispute or Reply", text: "Named in a report? Submit a rebuttal with evidence at disputes@blacklisted.com — verified replies are published." },
+            { Icon: Search, title: "Always Search First", text: "Run names, companies, wallets and IBANs through BlackListed before sending funds or signing." },
+            { Icon: Flag, title: "Know the Red Flags", text: "Guaranteed returns, urgency, off-platform payment, crypto-only deals, refusal to KYC — classic risk signals." },
+            { Icon: Camera, title: "Keep Evidence", text: "Preserve contracts, invoices, chats and receipts. Originals strengthen reports and recovery efforts." },
+            { Icon: Scale, title: "Dispute or Reply", text: "Named in a report? Submit a rebuttal with evidence at disputes@blacklisted.com — verified replies are published." },
           ].map((c) => (
             <div key={c.title} className="bl-card p-5 hover:border-[#444] hover:-translate-y-0.5 transition-all">
-              <h4 className="font-bold mb-1">{c.title}</h4>
+              <h4 className="font-bold mb-1 inline-flex items-center gap-2"><c.Icon className="w-4 h-4 text-white" strokeWidth={1.5} /> {c.title}</h4>
               <p className="text-muted-foreground text-sm">{c.text}</p>
             </div>
           ))}
+
         </div>
       </div>
 
