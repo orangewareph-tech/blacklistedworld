@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { RustCanvas } from "@/components/RustCanvas";
 import { AnimatedStat } from "@/components/AnimatedStat";
 import { IntroLogo } from "@/components/IntroLogo";
-import blacklistedLogo from "@/assets/blacklisted-logo.jpg";
+import blacklistedLogo from "@/assets/blacklisted-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -102,7 +102,7 @@ function Index() {
       {/* Header */}
       <header className="bg-surface/80 backdrop-blur-xl border-b border-border px-4 md:px-8 py-3.5 flex items-center justify-between flex-wrap gap-4 sticky top-0 z-50">
         <a href="/" className="flex items-center gap-2.5 group cursor-pointer">
-          <img src={blacklistedLogo} alt="BlackListed" className="h-9 md:h-10 w-auto rounded-sm shadow-[0_2px_12px_rgba(229,57,53,0.35)]" />
+          <img src={blacklistedLogo} alt="BlackListed" className="h-9 md:h-10 w-auto drop-shadow-[0_2px_8px_rgba(229,57,53,0.5)]" />
         </a>
         <nav className="hidden lg:flex items-center gap-6 text-sm text-muted-foreground">
           <button onClick={() => scrollTo("search-section")} className="hover:text-white transition-colors">Search</button>
@@ -125,7 +125,7 @@ function Index() {
             Global Due Diligence · Community-Verified
           </div>
           <h1 className="mb-6 flex justify-center">
-            <img src={blacklistedLogo} alt="BlackListed — Protect Yourself Before You Transact" className="w-full max-w-md md:max-w-lg h-auto rounded-lg shadow-[0_20px_60px_-15px_rgba(229,57,53,0.5)]" />
+            <img src={blacklistedLogo} alt="BlackListed — Protect Yourself Before You Transact" className="w-full max-w-md md:max-w-lg h-auto drop-shadow-[0_20px_40px_rgba(229,57,53,0.45)]" />
           </h1>
           <p className="text-sm md:text-base uppercase tracking-[0.25em] text-[var(--accent-glow)] font-semibold mb-3">
             Protect Yourself Before You Transact
