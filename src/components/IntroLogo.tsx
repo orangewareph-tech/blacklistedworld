@@ -34,24 +34,24 @@ export function IntroLogo() {
   return (
     <div
       className={`bl-intro ${stage === "out" ? "bl-intro-out" : ""}`}
-      onClick={skip}
-      role="button"
-      tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " " || e.key === "Escape") skip();
       }}
+      tabIndex={0}
     >
-      <div className="bl-intro-logo">
+      <div
+        className="bl-intro-logo"
+        onClick={skip}
+        role="button"
+        aria-label="Skip intro"
+      >
         <span className="bl-intro-black">BLACK</span>
         <span className="bl-intro-listed">LISTED</span>
         <span className="bl-intro-sweep" aria-hidden />
       </div>
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          skip();
-        }}
+        onClick={skip}
         className="bl-intro-skip"
         aria-label="Skip intro"
       >
