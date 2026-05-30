@@ -133,8 +133,8 @@ function Index() {
       </header>
 
       {/* Hero */}
-      <section id="search-section" className="relative max-w-3xl mx-auto px-6 pt-2 pb-10 md:pt-4 md:pb-14 text-center min-h-[420px] flex flex-col justify-center overflow-hidden">
-        <RustCanvas />
+      <RustCanvas />
+      <section id="search-section" className="relative max-w-3xl mx-auto px-6 pt-2 pb-10 md:pt-4 md:pb-14 text-center min-h-[420px] flex flex-col justify-center">
         <div className="relative z-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-border text-[0.7rem] uppercase tracking-[0.15em] text-muted-foreground mb-6">
             <span className="live-dot" />
