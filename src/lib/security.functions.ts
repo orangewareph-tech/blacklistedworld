@@ -24,8 +24,9 @@ export const verifyTurnstile = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const secret = process.env.TURNSTILE_SECRET_KEY;
-    const ip = getRequestIP({ xForwardedFor: true }) ?? null;
-    const ua = getRequestHeader("user-agent") ?? null;
+    const ip = getRequestIP({ xForwardedFor: true }) ?? "";
+    const ua = getRequestHeader("user-agent") ?? "";
+
 
     if (!secret) {
       return { success: false, error: "turnstile_not_configured", blocked: false };
