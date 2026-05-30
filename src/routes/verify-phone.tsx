@@ -157,7 +157,8 @@ function VerifyPhonePage() {
 
         {step === "done" && (
           <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
-            ✅ <strong>Phone verified.</strong>
+            <div className="inline-flex items-center gap-2 justify-center"><CheckCircle2 className="w-4 h-4" strokeWidth={1.75} /> <strong>Phone verified.</strong></div>
+
             <div className="mt-4">
               <Link to="/profile" className="bl-btn bl-btn-outline">Back to profile</Link>
             </div>
