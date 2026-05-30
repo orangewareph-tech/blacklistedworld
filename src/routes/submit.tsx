@@ -2,6 +2,10 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { Turnstile } from "@/components/Turnstile";
+import { RequireVerifiedEmail } from "@/components/RequireVerifiedEmail";
+import { verifyTurnstile } from "@/lib/security.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/submit")({
   head: () => ({
@@ -10,8 +14,16 @@ export const Route = createFileRoute("/submit")({
       { name: "description", content: "Submit a due diligence report. Reviewed by moderators before publication." },
     ],
   }),
-  component: SubmitPage,
+  component: SubmitPageWrapper,
 });
+
+function SubmitPageWrapper() {
+  return (
+    <RequireVerifiedEmail>
+      <SubmitPage />
+    </RequireVerifiedEmail>
+  );
+}
 
 const reportCategories = [
   "Fraud", "Scam Attempt", "Contract Breach", "Non-Payment", "Misrepresentation",
@@ -24,7 +36,9 @@ function SubmitPage() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState<{ ticket: string; id: string } | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const verifyToken = useServerFn(verifyTurnstile);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -34,8 +48,15 @@ function SubmitPage() {
     e.preventDefault();
     if (!user) return;
     setErr(null);
+    if (!captchaToken) {
+      setErr("Please complete the anti-bot check.");
+      return;
+    }
     setBusy(true);
     try {
+      const v = await verifyToken({ data: { token: captchaToken } });
+      if (!v.success) throw new Error("Anti-bot check failed. Please try again.");
+
       const fd = new FormData(e.currentTarget);
       const g = (k: string) => (fd.get(k)?.toString().trim() || null);
       const amountRaw = fd.get("amount_usd")?.toString();
@@ -67,11 +88,10 @@ function SubmitPage() {
       const { data: report, error } = await supabase
         .from("reports")
         .insert(payload)
-        .select("id")
+        .select("id, ticket_number")
         .single();
       if (error) throw error;
 
-      // Upload files
       const files = (fd.getAll("files") as File[]).filter((f) => f && f.size > 0);
       for (const file of files) {
         const path = `${user.id}/${report.id}/${Date.now()}-${file.name}`;
@@ -86,7 +106,7 @@ function SubmitPage() {
           size_bytes: file.size,
         });
       }
-      setDone(true);
+      setDone({ ticket: report.ticket_number as string, id: report.id });
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "Failed to submit");
     } finally {
@@ -111,8 +131,16 @@ function SubmitPage() {
 
           {done ? (
             <div className="text-center p-6 bg-[rgba(46,125,50,0.15)] border border-[rgba(46,125,50,0.4)] rounded-lg text-[#a5d6a7]">
-              ✅ <strong>Report submitted for review.</strong> Our moderators will review within 24–72 hours.
-              <div className="mt-4">
+              ✅ <strong>Report submitted for review.</strong>
+              <div className="mt-3 text-foreground">
+                Your ticket number:
+                <div className="text-2xl font-mono font-bold mt-1 tracking-wider">{done.ticket}</div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Save this number — you can log in anytime to check status or upload more evidence.
+              </p>
+              <div className="mt-4 flex gap-2 justify-center">
+                <Link to="/profile" className="bl-btn bl-btn-outline">My tickets</Link>
                 <Link to="/" className="bl-btn bl-btn-outline">Back to home</Link>
               </div>
             </div>
@@ -178,9 +206,12 @@ function SubmitPage() {
                     I certify that the information is truthful and that I possess supporting evidence. I agree to indemnify the operator against any claims arising from this submission.
                   </label>
                 </div>
+                <div className="md:col-span-2">
+                  <Turnstile onToken={setCaptchaToken} />
+                </div>
               </div>
               {err && <p className="text-sm text-[var(--accent)]">{err}</p>}
-              <button disabled={busy} type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">
+              <button disabled={busy || !captchaToken} type="submit" className="bl-btn bl-btn-primary w-full py-3.5 text-base">
                 {busy ? "Submitting…" : "🛡️ Submit Report for Review"}
               </button>
             </form>
