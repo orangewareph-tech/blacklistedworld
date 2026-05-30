@@ -90,6 +90,8 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          block_reason: string | null
+          blocked_until: string | null
           country: string | null
           created_at: string
           display_name: string | null
@@ -104,6 +106,8 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          block_reason?: string | null
+          blocked_until?: string | null
           country?: string | null
           created_at?: string
           display_name?: string | null
@@ -118,6 +122,8 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          block_reason?: string | null
+          blocked_until?: string | null
           country?: string | null
           created_at?: string
           display_name?: string | null
@@ -312,6 +318,39 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          created_at: string
+          email: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -345,6 +384,18 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      is_account_blocked: { Args: { _user_id: string }; Returns: boolean }
+      record_security_event: {
+        Args: {
+          _email: string
+          _event_type: string
+          _ip: string
+          _metadata?: Json
+          _user_agent: string
+          _user_id: string
+        }
+        Returns: Json
       }
     }
     Enums: {
