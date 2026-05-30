@@ -404,7 +404,7 @@ function Index() {
 
         {/* Legal Notice */}
         <div id="legal-section" className="bl-card p-7 md:p-9 mb-10">
-          <h2 className="text-xl font-bold mb-3">⚖️ Important Legal Notice</h2>
+          <h2 className="text-xl font-bold mb-3 inline-flex items-center gap-2"><Scale className="w-5 h-5 text-white" strokeWidth={1.5} /> Important Legal Notice</h2>
           <p className="text-sm text-muted-foreground mb-3">
             All reports published on this website are submitted by independent users. The submitter is <strong className="text-foreground">solely and exclusively responsible</strong> for the accuracy, truthfulness, legality, and completeness of any information provided.
           </p>
