@@ -4,20 +4,31 @@ export function IntroLogo() {
   const [stage, setStage] = useState<"in" | "out" | "done">("in");
 
   useEffect(() => {
-    const t1 = setTimeout(() => setStage("out"), 4300);
-    const t2 = setTimeout(() => setStage("done"), 5000);
+    const tOut = setTimeout(() => setStage("out"), 4400);
+    const tDone = setTimeout(() => setStage("done"), 5000);
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
+      clearTimeout(tOut);
+      clearTimeout(tDone);
     };
   }, []);
 
-  const skip = () => setStage("done");
-
   if (stage === "done") return null;
 
+  const skip = () => {
+    setStage("out");
+    setTimeout(() => setStage("done"), 500);
+  };
+
   return (
-    <div className={`bl-intro ${stage === "out" ? "bl-intro-out" : ""}`}>
+    <div
+      className={`bl-intro ${stage === "out" ? "bl-intro-out" : ""}`}
+      onClick={skip}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " " || e.key === "Escape") skip();
+      }}
+    >
       <div className="bl-intro-logo">
         <span className="bl-intro-black">BLACK</span>
         <span className="bl-intro-listed">LISTED</span>
@@ -25,7 +36,10 @@ export function IntroLogo() {
       </div>
       <button
         type="button"
-        onClick={skip}
+        onClick={(e) => {
+          e.stopPropagation();
+          skip();
+        }}
         className="bl-intro-skip"
         aria-label="Skip intro"
       >
