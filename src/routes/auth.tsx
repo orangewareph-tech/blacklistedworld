@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { Turnstile } from "@/components/Turnstile";
-import { verifyTurnstile } from "@/lib/security.functions";
+import { verifyTurnstile, recordAuthFailure } from "@/lib/security.functions";
 import { useServerFn } from "@tanstack/react-start";
+
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
