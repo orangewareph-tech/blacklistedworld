@@ -87,6 +87,7 @@ export function HamburgerMenu() {
               <MenuLink to="/about" icon={Info} label="About Us" onClick={close} />
               <MenuLink to="/contact" icon={Phone} label="Contact" onClick={close} />
               <MenuLink to="/reports" icon={ShieldCheck} label="Browse Reports" onClick={close} />
+              <MenuLink to="/pre-assessment" icon={ShieldCheck} label="Pre-Assessment Request" onClick={close} disabled={!user} />
               {isAdmin && <MenuLink to="/admin" icon={ShieldCheck} label="Admin Dashboard" onClick={close} />}
             </nav>
 

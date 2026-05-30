@@ -3,6 +3,9 @@ import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
+import { Turnstile } from "@/components/Turnstile";
+import { verifyTurnstile } from "@/lib/security.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -21,8 +24,12 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [signedUp, setSignedUp] = useState(false);
+  const verifyToken = useServerFn(verifyTurnstile);
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
@@ -31,18 +38,33 @@ function AuthPage() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErr(null);
+    if (!captchaToken) {
+      setErr("Please complete the anti-bot check.");
+      return;
+    }
     setBusy(true);
     try {
+      const v = await verifyToken({ data: { token: captchaToken } });
+      if (!v.success) throw new Error("Anti-bot check failed. Please try again.");
+
       if (mode === "signup") {
+        const uname = username.trim().toLowerCase();
+        if (!/^[a-z0-9_]{3,24}$/.test(uname)) {
+          throw new Error("Username must be 3–24 characters: lowercase letters, numbers, underscore.");
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
-            data: { display_name: displayName || email.split("@")[0] },
+            data: {
+              display_name: displayName || uname,
+              username: uname,
+            },
           },
         });
         if (error) throw error;
+        setSignedUp(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -54,6 +76,23 @@ function AuthPage() {
     }
   };
 
+  if (signedUp) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+        <div className="bl-card max-w-md w-full p-8 text-center">
+          <h1 className="text-2xl font-bold mb-2">Check your email</h1>
+          <p className="text-sm text-muted-foreground mb-4">
+            We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
+          </p>
+          <p className="text-xs text-muted-foreground mb-6">
+            You must verify your email before you can submit reports or pre-assessment requests.
+          </p>
+          <Link to="/" className="bl-btn bl-btn-outline">Back to home</Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-12">
       <div className="bl-card w-full max-w-md p-8">
@@ -62,7 +101,9 @@ function AuthPage() {
           {mode === "signin" ? "Sign in to BlackListed" : "Create your account"}
         </h1>
         <p className="text-sm text-muted-foreground mb-6">
-          {mode === "signin" ? "Access submissions, flagging and your report history." : "Free account. Required to submit reports."}
+          {mode === "signin"
+            ? "Access submissions, flagging and your report history."
+            : "Free account. Required to submit reports. Email verification + anti-bot check apply."}
         </p>
 
         <div className="space-y-2 mb-5">
@@ -100,16 +141,32 @@ function AuthPage() {
 
         <form onSubmit={onSubmit} className="space-y-3">
           {mode === "signup" && (
-            <div>
-              <label className="text-sm font-semibold text-[#ccc] block mb-1">Display name</label>
-              <input
-                className="bl-input"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                maxLength={80}
-                placeholder="Jane Doe"
-              />
-            </div>
+            <>
+              <div>
+                <label className="text-sm font-semibold text-[#ccc] block mb-1">Username</label>
+                <input
+                  className="bl-input"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  minLength={3}
+                  maxLength={24}
+                  placeholder="jane_doe"
+                  pattern="[a-zA-Z0-9_]+"
+                />
+                <p className="text-xs text-muted-foreground mt-1">3–24 chars: letters, numbers, underscore.</p>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-[#ccc] block mb-1">Display name</label>
+                <input
+                  className="bl-input"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  maxLength={80}
+                  placeholder="Jane Doe"
+                />
+              </div>
+            </>
           )}
           <div>
             <label className="text-sm font-semibold text-[#ccc] block mb-1">Email</label>
@@ -134,13 +191,16 @@ function AuthPage() {
               maxLength={72}
             />
           </div>
+
+          <Turnstile onToken={setCaptchaToken} />
+
           {err && <p className="text-sm text-[var(--accent)]">{err}</p>}
-          <button type="submit" disabled={busy} className="bl-btn bl-btn-primary w-full py-3">
+          <button type="submit" disabled={busy || !captchaToken} className="bl-btn bl-btn-primary w-full py-3">
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>
         </form>
         <button
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+          onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setErr(null); }}
           className="text-sm text-[var(--accent-glow)] mt-5 hover:underline w-full text-center"
         >
           {mode === "signin" ? "No account? Sign up" : "Already have an account? Sign in"}

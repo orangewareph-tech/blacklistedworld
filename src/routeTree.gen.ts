@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyPhoneRouteImport } from './routes/verify-phone'
 import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PreAssessmentRouteImport } from './routes/pre-assessment'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -19,6 +21,11 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReportsIdRouteImport } from './routes/reports.$id'
 
+const VerifyPhoneRoute = VerifyPhoneRouteImport.update({
+  id: '/verify-phone',
+  path: '/verify-phone',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubmitRoute = SubmitRouteImport.update({
   id: '/submit',
   path: '/submit',
@@ -32,6 +39,11 @@ const ReportsRoute = ReportsRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreAssessmentRoute = PreAssessmentRouteImport.update({
+  id: '/pre-assessment',
+  path: '/pre-assessment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -71,9 +83,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/pre-assessment': typeof PreAssessmentRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
+  '/verify-phone': typeof VerifyPhoneRoute
   '/reports/$id': typeof ReportsIdRoute
 }
 export interface FileRoutesByTo {
@@ -82,9 +96,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/pre-assessment': typeof PreAssessmentRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
+  '/verify-phone': typeof VerifyPhoneRoute
   '/reports/$id': typeof ReportsIdRoute
 }
 export interface FileRoutesById {
@@ -94,9 +110,11 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/pre-assessment': typeof PreAssessmentRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
+  '/verify-phone': typeof VerifyPhoneRoute
   '/reports/$id': typeof ReportsIdRoute
 }
 export interface FileRouteTypes {
@@ -107,9 +125,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/pre-assessment'
     | '/profile'
     | '/reports'
     | '/submit'
+    | '/verify-phone'
     | '/reports/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -118,9 +138,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/pre-assessment'
     | '/profile'
     | '/reports'
     | '/submit'
+    | '/verify-phone'
     | '/reports/$id'
   id:
     | '__root__'
@@ -129,9 +151,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/contact'
+    | '/pre-assessment'
     | '/profile'
     | '/reports'
     | '/submit'
+    | '/verify-phone'
     | '/reports/$id'
   fileRoutesById: FileRoutesById
 }
@@ -141,13 +165,22 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  PreAssessmentRoute: typeof PreAssessmentRoute
   ProfileRoute: typeof ProfileRoute
   ReportsRoute: typeof ReportsRouteWithChildren
   SubmitRoute: typeof SubmitRoute
+  VerifyPhoneRoute: typeof VerifyPhoneRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-phone': {
+      id: '/verify-phone'
+      path: '/verify-phone'
+      fullPath: '/verify-phone'
+      preLoaderRoute: typeof VerifyPhoneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/submit': {
       id: '/submit'
       path: '/submit'
@@ -167,6 +200,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pre-assessment': {
+      id: '/pre-assessment'
+      path: '/pre-assessment'
+      fullPath: '/pre-assessment'
+      preLoaderRoute: typeof PreAssessmentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -231,9 +271,11 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  PreAssessmentRoute: PreAssessmentRoute,
   ProfileRoute: ProfileRoute,
   ReportsRoute: ReportsRouteWithChildren,
   SubmitRoute: SubmitRoute,
+  VerifyPhoneRoute: VerifyPhoneRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
