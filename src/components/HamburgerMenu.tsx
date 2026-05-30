@@ -43,15 +43,16 @@ export function HamburgerMenu() {
             aria-modal="true"
             className="relative w-full max-w-md max-h-[90vh] rounded-2xl bg-[#0a0a0a] border border-white/15 shadow-[0_20px_80px_-10px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+            <button
+              aria-label="Close menu"
+              onClick={close}
+              className="absolute top-3 right-3 z-10 inline-flex items-center justify-center h-10 w-10 rounded-full bg-white text-black hover:bg-white/80 shadow-lg transition-colors"
+            >
+              <X className="h-5 w-5" strokeWidth={2.5} />
+            </button>
+
+            <div className="flex items-center px-5 py-4 border-b border-white/10 pr-16">
               <span className="text-sm uppercase tracking-[0.18em] text-muted-foreground">Menu</span>
-              <button
-                aria-label="Close menu"
-                onClick={close}
-                className="inline-flex items-center justify-center h-9 w-9 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 text-white transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
 
             {/* User block */}
