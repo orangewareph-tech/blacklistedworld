@@ -14,16 +14,258 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          country: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          is_verified: boolean
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          is_verified?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_verified?: boolean
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      report_evidence: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          mime_type: string | null
+          report_id: string
+          size_bytes: number | null
+          uploader_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          mime_type?: string | null
+          report_id: string
+          size_bytes?: number | null
+          uploader_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          mime_type?: string | null
+          report_id?: string
+          size_bytes?: number | null
+          uploader_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_evidence_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_flags: {
+        Row: {
+          created_at: string
+          details: string | null
+          flagger_id: string | null
+          id: string
+          reason: string
+          report_id: string
+          resolved: boolean
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          flagger_id?: string | null
+          id?: string
+          reason: string
+          report_id: string
+          resolved?: boolean
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          flagger_id?: string | null
+          id?: string
+          reason?: string
+          report_id?: string
+          resolved?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_flags_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          admin_notes: string | null
+          alias: string | null
+          amount_usd: number | null
+          bank_partial: string | null
+          category: string
+          city: string | null
+          country: string | null
+          court_case_no: string | null
+          created_at: string
+          description: string
+          email: string | null
+          id: string
+          incident_date: string | null
+          industry: string | null
+          national_id_partial: string | null
+          passport_partial: string | null
+          phone: string | null
+          police_report_no: string | null
+          reference_no: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          risk: Database["public"]["Enums"]["risk_level"]
+          social: string | null
+          status: Database["public"]["Enums"]["report_status"]
+          subject_name: string
+          submitter_id: string | null
+          transaction_type: string
+          updated_at: string
+          wallet: string | null
+          website: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          alias?: string | null
+          amount_usd?: number | null
+          bank_partial?: string | null
+          category: string
+          city?: string | null
+          country?: string | null
+          court_case_no?: string | null
+          created_at?: string
+          description: string
+          email?: string | null
+          id?: string
+          incident_date?: string | null
+          industry?: string | null
+          national_id_partial?: string | null
+          passport_partial?: string | null
+          phone?: string | null
+          police_report_no?: string | null
+          reference_no?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk?: Database["public"]["Enums"]["risk_level"]
+          social?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          subject_name: string
+          submitter_id?: string | null
+          transaction_type: string
+          updated_at?: string
+          wallet?: string | null
+          website?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          alias?: string | null
+          amount_usd?: number | null
+          bank_partial?: string | null
+          category?: string
+          city?: string | null
+          country?: string | null
+          court_case_no?: string | null
+          created_at?: string
+          description?: string
+          email?: string | null
+          id?: string
+          incident_date?: string | null
+          industry?: string | null
+          national_id_partial?: string | null
+          passport_partial?: string | null
+          phone?: string | null
+          police_report_no?: string | null
+          reference_no?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk?: Database["public"]["Enums"]["risk_level"]
+          social?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          subject_name?: string
+          submitter_id?: string | null
+          transaction_type?: string
+          updated_at?: string
+          wallet?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      report_status: "pending" | "approved" | "rejected" | "resolved"
+      risk_level: "low" | "medium" | "high"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +392,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      report_status: ["pending", "approved", "rejected", "resolved"],
+      risk_level: ["low", "medium", "high"],
+    },
   },
 } as const
