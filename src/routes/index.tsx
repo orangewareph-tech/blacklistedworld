@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { RustCanvas } from "@/components/RustCanvas";
 import { AnimatedStat } from "@/components/AnimatedStat";
 import { IntroLogo } from "@/components/IntroLogo";
+import blacklistedLogo from "@/assets/blacklisted-logo.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -55,12 +56,9 @@ function Index() {
 
       {/* Header */}
       <header className="bg-surface/80 backdrop-blur-xl border-b border-border px-4 md:px-8 py-3.5 flex items-center justify-between flex-wrap gap-4 sticky top-0 z-50">
-        <div className="flex items-center gap-2.5 group cursor-default">
-          <div className="bl-logo-icon">⚠️</div>
-          <div className="text-2xl font-extrabold tracking-tight text-white">
-            Black<span className="text-[var(--accent-glow)]">Listed</span>
-          </div>
-        </div>
+        <a href="/" className="flex items-center gap-2.5 group cursor-pointer">
+          <img src={blacklistedLogo} alt="BlackListed" className="h-9 md:h-10 w-auto rounded-sm shadow-[0_2px_12px_rgba(229,57,53,0.35)]" />
+        </a>
         <div className="flex gap-2.5">
           <button className="bl-btn bl-btn-outline" onClick={() => alert("🔒 Login / Sign Up — Coming soon.")}>Log In</button>
           <button className="bl-btn bl-btn-primary" onClick={scrollToSubmit}>➕ Submit Report</button>
@@ -75,8 +73,8 @@ function Index() {
             <span className="live-dot" />
             Live · Community-Verified
           </div>
-          <h1 className="text-4xl md:text-6xl font-black tracking-[-0.03em] leading-[1.05] mb-4 text-white">
-            Check <span className="hero-highlight">Before</span> You Trust.
+          <h1 className="mb-6 flex justify-center">
+            <img src={blacklistedLogo} alt="BlackListed — Check Before You Trust" className="w-full max-w-md md:max-w-lg h-auto rounded-lg shadow-[0_20px_60px_-15px_rgba(229,57,53,0.5)]" />
           </h1>
           <p className="text-muted-foreground text-base md:text-lg max-w-md mx-auto mb-9">
             Search our community-driven database of reported scammers before you send money, share info, or sign anything.
