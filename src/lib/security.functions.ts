@@ -109,15 +109,35 @@ export const getBlockStatus = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { data: row } = await supabaseAdmin
       .from("profiles")
-      .select("blocked_until, block_reason")
+      .select("blocked_at, blocked_until, block_reason")
       .eq("id", data.userId)
       .maybeSingle();
 
     const blockedUntil = row?.blocked_until ?? null;
+    const blockedAt = (row as { blocked_at?: string | null } | null)?.blocked_at ?? null;
     const isBlocked = blockedUntil ? new Date(blockedUntil).getTime() > Date.now() : false;
+
+    let recentEvents: Array<{ type: string; at: string }> = [];
+    if (isBlocked) {
+      const { data: ev } = await supabaseAdmin
+        .from("security_events")
+        .select("event_type, created_at")
+        .eq("user_id", data.userId)
+        .in("event_type", ["captcha_fail", "otp_fail", "login_fail", "signup_attempt"])
+        .order("created_at", { ascending: false })
+        .limit(8);
+      recentEvents = (ev ?? []).map((e) => ({
+        type: e.event_type as string,
+        at: e.created_at as string,
+      }));
+    }
+
     return {
       blocked: isBlocked,
+      blockedAt,
       blockedUntil,
       reason: row?.block_reason ?? null,
+      recentEvents,
     };
   });
+
