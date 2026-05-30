@@ -1,21 +1,47 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+
+const markIntroSeen = () => {
+  try {
+    localStorage.setItem("bl-intro-seen", "1");
+  } catch {
+    // Ignore storage failures; skipping the intro should still work immediately.
+  }
+};
+
+const hasIntroBeenSeen = () => {
+  try {
+    return localStorage.getItem("bl-intro-seen") === "1";
+  } catch {
+    return false;
+  }
+};
 
 export function IntroLogo() {
   const { user } = useAuth();
   const [stage, setStage] = useState<"in" | "out" | "done">("in");
 
+  const skip = useCallback(
+    (event?: { preventDefault?: () => void; stopPropagation?: () => void }) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      markIntroSeen();
+      setStage("done");
+    },
+    [],
+  );
+
   useEffect(() => {
     // Skip if already seen, or user is logged in
-    if (localStorage.getItem("bl-intro-seen") || user) {
+    if (hasIntroBeenSeen() || user) {
       setStage("done");
-      localStorage.setItem("bl-intro-seen", "1");
+      markIntroSeen();
       return;
     }
     const tOut = setTimeout(() => setStage("out"), 4400);
     const tDone = setTimeout(() => {
       setStage("done");
-      localStorage.setItem("bl-intro-seen", "1");
+      markIntroSeen();
     }, 5000);
     return () => {
       clearTimeout(tOut);
@@ -25,15 +51,11 @@ export function IntroLogo() {
 
   if (stage === "done") return null;
 
-  const skip = () => {
-    localStorage.setItem("bl-intro-seen", "1");
-    setStage("out");
-    setTimeout(() => setStage("done"), 500);
-  };
-
   return (
     <div
       className={`bl-intro ${stage === "out" ? "bl-intro-out" : ""}`}
+      onPointerDown={skip}
+      onClick={skip}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " " || e.key === "Escape") skip();
       }}
@@ -41,6 +63,7 @@ export function IntroLogo() {
     >
       <div
         className="bl-intro-logo"
+        onPointerDown={skip}
         onClick={skip}
         role="button"
         aria-label="Skip intro"
@@ -51,6 +74,7 @@ export function IntroLogo() {
       </div>
       <button
         type="button"
+        onPointerDown={skip}
         onClick={skip}
         className="bl-intro-skip"
         aria-label="Skip intro"
