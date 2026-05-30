@@ -2,6 +2,9 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { recordAuthFailure } from "@/lib/security.functions";
+import { useServerFn } from "@tanstack/react-start";
+
 
 export const Route = createFileRoute("/verify-phone")({
   head: () => ({
@@ -22,6 +25,8 @@ function VerifyPhonePage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const recordFail = useServerFn(recordAuthFailure);
+
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -56,7 +61,20 @@ function VerifyPhonePage() {
         token: code.trim(),
         type: "phone_change",
       });
-      if (error) throw error;
+      if (error) {
+        const r = await recordFail({
+          data: {
+            type: "otp_fail",
+            userId: user?.id,
+            email: user?.email ?? undefined,
+            reason: error.message.slice(0, 200),
+          },
+        });
+        if (r.blocked) {
+          throw new Error("Too many failed code attempts. This account is temporarily blocked for 1 hour.");
+        }
+        throw error;
+      }
       if (user) {
         await supabase
           .from("profiles")
@@ -70,6 +88,7 @@ function VerifyPhonePage() {
       setBusy(false);
     }
   };
+
 
   if (loading || !user) return null;
 

@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { Turnstile } from "@/components/Turnstile";
-import { verifyTurnstile } from "@/lib/security.functions";
+import { verifyTurnstile, recordAuthFailure } from "@/lib/security.functions";
 import { useServerFn } from "@tanstack/react-start";
+
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -30,6 +31,8 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [signedUp, setSignedUp] = useState(false);
   const verifyToken = useServerFn(verifyTurnstile);
+  const recordFail = useServerFn(recordAuthFailure);
+
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
@@ -44,8 +47,19 @@ function AuthPage() {
     }
     setBusy(true);
     try {
-      const v = await verifyToken({ data: { token: captchaToken } });
-      if (!v.success) throw new Error("Anti-bot check failed. Please try again.");
+      const v = await verifyToken({
+        data: {
+          token: captchaToken,
+          email: email || undefined,
+          context: mode === "signup" ? "signup" : "signin",
+        },
+      });
+      if (!v.success) {
+        if (v.blocked) {
+          throw new Error("Too many failed attempts. This account/IP is temporarily blocked. Try again in 1 hour.");
+        }
+        throw new Error("Anti-bot check failed. Please try again.");
+      }
 
       if (mode === "signup") {
         const uname = username.trim().toLowerCase();
@@ -67,8 +81,17 @@ function AuthPage() {
         setSignedUp(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          const r = await recordFail({
+            data: { type: "login_fail", email: email || undefined, reason: error.message.slice(0, 200) },
+          });
+          if (r.blocked) {
+            throw new Error("Too many failed sign-in attempts. Temporarily blocked for 1 hour.");
+          }
+          throw error;
+        }
       }
+
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "Something went wrong");
     } finally {

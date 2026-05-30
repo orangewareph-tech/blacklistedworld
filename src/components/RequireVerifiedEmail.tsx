@@ -1,17 +1,53 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useServerFn } from "@tanstack/react-start";
+import { getBlockStatus } from "@/lib/security.functions";
 
 export function RequireVerifiedEmail({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [block, setBlock] = useState<{ blocked: boolean; until: string | null; reason: string | null } | null>(null);
+  const checkBlock = useServerFn(getBlockStatus);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const r = await checkBlock({ data: { userId: user.id } });
+      if (!cancelled) setBlock({ blocked: r.blocked, until: r.blockedUntil, reason: r.reason });
+    })();
+    return () => { cancelled = true; };
+  }, [user, checkBlock]);
 
   if (loading) return null;
-  if (!user) return <>{children}</>; // upstream guard handles unauthenticated
+  if (!user) return <>{children}</>;
 
-  // email_confirmed_at is present on the supabase User when verified
+  if (block?.blocked) {
+    const until = block.until ? new Date(block.until).toLocaleString() : "soon";
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+        <div className="bl-card max-w-md w-full p-8 text-center border-[var(--accent)]/40">
+          <h1 className="text-xl font-bold mb-2 text-[var(--accent)]">Account temporarily blocked</h1>
+          <p className="text-sm text-muted-foreground mb-2">
+            Your account has been automatically suspended due to suspicious activity.
+          </p>
+          {block.reason && (
+            <p className="text-xs text-muted-foreground mb-4 italic">{block.reason}</p>
+          )}
+          <p className="text-sm text-muted-foreground">
+            Submissions are disabled until <strong>{until}</strong>.
+          </p>
+          <p className="text-xs text-muted-foreground mt-4">
+            If you believe this is a mistake, contact support.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const confirmed = !!user.email_confirmed_at;
   if (confirmed) return <>{children}</>;
 
