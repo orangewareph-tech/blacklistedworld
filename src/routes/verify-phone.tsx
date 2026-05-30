@@ -61,7 +61,20 @@ function VerifyPhonePage() {
         token: code.trim(),
         type: "phone_change",
       });
-      if (error) throw error;
+      if (error) {
+        const r = await recordFail({
+          data: {
+            type: "otp_fail",
+            userId: user?.id,
+            email: user?.email ?? undefined,
+            reason: error.message.slice(0, 200),
+          },
+        });
+        if (r.blocked) {
+          throw new Error("Too many failed code attempts. This account is temporarily blocked for 1 hour.");
+        }
+        throw error;
+      }
       if (user) {
         await supabase
           .from("profiles")
@@ -75,6 +88,7 @@ function VerifyPhonePage() {
       setBusy(false);
     }
   };
+
 
   if (loading || !user) return null;
 
