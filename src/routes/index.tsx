@@ -114,7 +114,7 @@ function Index() {
       {/* Header */}
       <header className="bg-surface/80 backdrop-blur-xl border-b border-border px-4 md:px-8 py-3.5 flex items-center justify-between flex-wrap gap-4 sticky top-0 z-50">
         <a href="/" className="flex items-center gap-2.5 group cursor-pointer">
-          <img src={blacklistedLogo} alt="BlackListed" className="h-9 md:h-10 w-auto drop-shadow-[0_2px_8px_rgba(229,57,53,0.5)]" />
+          <img src={blacklistedLogo} alt="BlackListed" className="h-[2.7rem] md:h-12 w-auto drop-shadow-[0_2px_8px_rgba(229,57,53,0.5)]" />
         </a>
         <nav className="hidden lg:flex items-center gap-6 text-sm text-muted-foreground">
           <Link to="/reports" className="hover:text-white transition-colors">Reports</Link>
@@ -122,6 +122,27 @@ function Index() {
           <button onClick={() => scrollTo("privacy-section")} className="hover:text-white transition-colors">Privacy</button>
           {isAdmin && <Link to="/admin" className="hover:text-white transition-colors">Admin</Link>}
         </nav>
+        <div className="hidden md:flex items-center flex-1 max-w-md mx-2">
+          <div className="relative w-full">
+            <input
+              type="text"
+              value={heroQuery}
+              onChange={(e) => setHeroQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") runHeroSearch(); }}
+              placeholder="Search blacklisted companies, names, wallets..."
+              className="w-full bg-background/60 border border-border rounded-full pl-10 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--accent-glow)] transition-colors"
+              aria-label="Search blacklisted entries"
+            />
+            <button
+              type="button"
+              onClick={runHeroSearch}
+              aria-label="Search"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-white hover:text-[var(--accent-glow)] transition-colors"
+            >
+              <Search className="w-4 h-4" strokeWidth={1.75} />
+            </button>
+          </div>
+        </div>
         <div className="flex gap-2.5 items-center">
           <div className="hidden md:flex gap-2.5">
             {user ? (
@@ -134,6 +155,7 @@ function Index() {
           <HamburgerMenu />
         </div>
       </header>
+
 
       {/* Hero */}
       <RustCanvas />
