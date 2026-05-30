@@ -5,6 +5,8 @@ import { AnimatedStat } from "@/components/AnimatedStat";
 import { IntroLogo } from "@/components/IntroLogo";
 import { useAuth } from "@/hooks/useAuth";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { PlayCircle } from "lucide-react";
 import blacklistedLogo from "@/assets/blacklisted-logo.png";
 
 export const Route = createFileRoute("/")({
@@ -90,6 +92,7 @@ function Index() {
   const [submitted, setSubmitted] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [heroQuery, setHeroQuery] = useState("");
+  const [videoOpen, setVideoOpen] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const runHeroSearch = () => {
@@ -146,9 +149,32 @@ function Index() {
           <p className="text-sm md:text-base uppercase tracking-[0.25em] text-[var(--accent-glow)] font-semibold mb-3">
             Protect Yourself Before You Transact
           </p>
-          <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-8">
+          <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-6">
             A public due diligence platform where users share real experiences with individuals, companies, agents, brokers, suppliers, buyers, investors and service providers — worldwide.
           </p>
+          <div className="flex justify-center mb-8">
+            <button
+              onClick={() => setVideoOpen(true)}
+              className="bl-btn bl-btn-outline inline-flex items-center gap-2 group"
+              aria-label="Watch intro video"
+            >
+              <PlayCircle className="w-5 h-5 text-[var(--accent-glow)] transition-transform group-hover:scale-110" />
+              Watch Intro Video
+            </button>
+          </div>
+          <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
+            <DialogContent className="max-w-3xl p-0 bg-black border-border overflow-hidden">
+              <DialogTitle className="sr-only">BlackListed Intro Video</DialogTitle>
+              {videoOpen && (
+                <video
+                  src="/blacklisted-intro.mp4"
+                  controls
+                  autoPlay
+                  className="w-full h-auto"
+                />
+              )}
+            </DialogContent>
+          </Dialog>
           <div className="bl-search">
             <input
               type="text"
