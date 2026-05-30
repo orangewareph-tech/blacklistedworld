@@ -25,6 +25,8 @@ function VerifyPhonePage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const recordFail = useServerFn(recordAuthFailure);
+
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
