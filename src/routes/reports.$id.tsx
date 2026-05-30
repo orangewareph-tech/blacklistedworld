@@ -2,6 +2,8 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { CheckCircle2, Flag } from "lucide-react";
+
 
 export const Route = createFileRoute("/reports/$id")({
   component: ReportDetail,
