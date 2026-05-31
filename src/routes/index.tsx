@@ -161,23 +161,23 @@ function Index() {
       <RustCanvas />
       <section id="search-section" className="relative max-w-3xl mx-auto px-6 pt-2 pb-10 md:pt-4 md:pb-14 text-center min-h-[420px] flex flex-col justify-center">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-border text-[0.7rem] uppercase tracking-[0.15em] text-muted-foreground mb-6">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-border text-[0.7rem] uppercase tracking-[0.15em] text-muted-foreground mb-6 animate-fade-in" style={{ animationDelay: "0ms", animationFillMode: "both" }}>
             <span className="live-dot" />
             Global Due Diligence · Community-Verified
           </div>
-          <h1 className="mb-6 flex justify-center">
-            <img src={blacklistedLogo} alt="BlackListed — Protect Yourself Before You Transact" className="w-full max-w-md md:max-w-lg h-auto drop-shadow-[0_20px_40px_rgba(229,57,53,0.45)]" />
+          <h1 className="mb-6 flex justify-center animate-fade-in" style={{ animationDelay: "120ms", animationFillMode: "both" }}>
+            <img src={blacklistedLogo} alt="BlackListed — Protect Yourself Before You Transact" className="w-full max-w-md md:max-w-lg h-auto drop-shadow-[0_20px_40px_rgba(229,57,53,0.45)] hover-scale" />
           </h1>
-          <p className="text-sm md:text-base uppercase tracking-[0.25em] text-[var(--accent-glow)] font-semibold mb-3">
+          <p className="text-sm md:text-base uppercase tracking-[0.25em] text-[var(--accent-glow)] font-semibold mb-3 animate-fade-in" style={{ animationDelay: "260ms", animationFillMode: "both" }}>
             Protect Yourself Before You Transact
           </p>
-          <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-6">
+          <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-6 animate-fade-in" style={{ animationDelay: "400ms", animationFillMode: "both" }}>
             A public due diligence platform where users share real experiences with individuals, companies, agents, brokers, suppliers, buyers, investors and service providers — worldwide.
           </p>
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-8 animate-fade-in" style={{ animationDelay: "540ms", animationFillMode: "both" }}>
             <button
               onClick={() => setVideoOpen(true)}
-              className="bl-btn bl-btn-outline inline-flex items-center gap-2 group"
+              className="bl-btn bl-btn-outline inline-flex items-center gap-2 group hover-scale"
               aria-label="Watch intro video"
             >
               <PlayCircle className="w-5 h-5 text-[var(--accent-glow)] transition-transform group-hover:scale-110" />
