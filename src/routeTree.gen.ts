@@ -19,6 +19,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ReportsIdRouteImport } from './routes/reports.$id'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 
@@ -72,6 +73,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ReportsIdRoute = ReportsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -96,11 +102,11 @@ export interface FileRoutesByFullPath {
   '/verify-phone': typeof VerifyPhoneRoute
   '/admin/login': typeof AdminLoginRoute
   '/reports/$id': typeof ReportsIdRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/pre-assessment': typeof PreAssessmentRoute
@@ -110,6 +116,7 @@ export interface FileRoutesByTo {
   '/verify-phone': typeof VerifyPhoneRoute
   '/admin/login': typeof AdminLoginRoute
   '/reports/$id': typeof ReportsIdRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +132,7 @@ export interface FileRoutesById {
   '/verify-phone': typeof VerifyPhoneRoute
   '/admin/login': typeof AdminLoginRoute
   '/reports/$id': typeof ReportsIdRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,11 +149,11 @@ export interface FileRouteTypes {
     | '/verify-phone'
     | '/admin/login'
     | '/reports/$id'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/admin'
     | '/auth'
     | '/contact'
     | '/pre-assessment'
@@ -155,6 +163,7 @@ export interface FileRouteTypes {
     | '/verify-phone'
     | '/admin/login'
     | '/reports/$id'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/verify-phone'
     | '/admin/login'
     | '/reports/$id'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -256,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/reports/$id': {
       id: '/reports/$id'
       path: '/$id'
@@ -275,10 +292,12 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
