@@ -20,6 +20,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReportsIdRouteImport } from './routes/reports.$id'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 
 const VerifyPhoneRoute = VerifyPhoneRouteImport.update({
   id: '/verify-phone',
@@ -76,11 +77,16 @@ const ReportsIdRoute = ReportsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ReportsRoute,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/pre-assessment': typeof PreAssessmentRoute
@@ -88,12 +94,13 @@ export interface FileRoutesByFullPath {
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
   '/verify-phone': typeof VerifyPhoneRoute
+  '/admin/login': typeof AdminLoginRoute
   '/reports/$id': typeof ReportsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/pre-assessment': typeof PreAssessmentRoute
@@ -101,13 +108,14 @@ export interface FileRoutesByTo {
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
   '/verify-phone': typeof VerifyPhoneRoute
+  '/admin/login': typeof AdminLoginRoute
   '/reports/$id': typeof ReportsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/pre-assessment': typeof PreAssessmentRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
   '/verify-phone': typeof VerifyPhoneRoute
+  '/admin/login': typeof AdminLoginRoute
   '/reports/$id': typeof ReportsIdRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/submit'
     | '/verify-phone'
+    | '/admin/login'
     | '/reports/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/submit'
     | '/verify-phone'
+    | '/admin/login'
     | '/reports/$id'
   id:
     | '__root__'
@@ -156,13 +167,14 @@ export interface FileRouteTypes {
     | '/reports'
     | '/submit'
     | '/verify-phone'
+    | '/admin/login'
     | '/reports/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   PreAssessmentRoute: typeof PreAssessmentRoute
@@ -251,8 +263,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportsIdRouteImport
       parentRoute: typeof ReportsRoute
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminLoginRoute: typeof AdminLoginRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminLoginRoute: AdminLoginRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface ReportsRouteChildren {
   ReportsIdRoute: typeof ReportsIdRoute
@@ -268,7 +297,7 @@ const ReportsRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   PreAssessmentRoute: PreAssessmentRoute,
