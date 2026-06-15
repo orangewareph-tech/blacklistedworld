@@ -88,7 +88,9 @@ export function HamburgerMenu() {
               <MenuLink to="/contact" icon={Phone} label="Contact" onClick={close} />
               <MenuLink to="/reports" icon={ShieldCheck} label="Browse Reports" onClick={close} />
               <MenuLink to="/pre-assessment" icon={ShieldCheck} label="Pre-Assessment Request" onClick={close} disabled={!user} />
-              {isAdmin && <MenuLink to="/admin" icon={ShieldCheck} label="Admin Dashboard" onClick={close} />}
+              {isAdmin
+                ? <MenuLink to="/admin" icon={ShieldCheck} label="Admin Dashboard" onClick={close} />
+                : <MenuLink to="/admin/login" icon={ShieldCheck} label="Admin CMS Login" onClick={close} />}
             </nav>
 
             <div className="px-5 py-4 border-t border-border space-y-2">
