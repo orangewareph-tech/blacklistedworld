@@ -139,8 +139,8 @@ function AdminPage() {
 async function logAction(action: string, target_type: string | null, target_id: string | null, summary: string, metadata: Record<string, unknown> = {}) {
   await supabase.rpc("log_admin_action", {
     _action: action,
-    _target_type: target_type,
-    _target_id: target_id,
+    _target_type: target_type ?? undefined,
+    _target_id: target_id ?? undefined,
     _summary: summary,
     _metadata: metadata as never,
   });
