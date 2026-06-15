@@ -116,10 +116,15 @@ function AdminLoginPage() {
             </button>
           </form>
 
-          <p className="text-[0.65rem] text-muted-foreground mt-6 leading-relaxed">
-            All access is logged. Non-admin accounts are rejected and signed out automatically.
-            If you've forgotten your credentials, contact a fellow administrator.
-          </p>
+          <div className="mt-6 pt-4 border-t border-white/10">
+            <Link to="/admin/setup" className="text-xs text-[var(--accent)] hover:underline">
+              First-time setup or reset admin password →
+            </Link>
+            <p className="text-[0.65rem] text-muted-foreground mt-3 leading-relaxed">
+              All access is logged. Non-admin accounts are rejected and signed out automatically.
+              Setup is restricted to a single pre-authorized email.
+            </p>
+          </div>
         </div>
       </div>
     </div>
