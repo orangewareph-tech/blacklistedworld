@@ -47,6 +47,66 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          read_by: string[]
+          target_id: string | null
+          target_type: string | null
+          title: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          read_by?: string[]
+          target_id?: string | null
+          target_type?: string | null
+          title: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          read_by?: string[]
+          target_id?: string | null
+          target_type?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      moderation_templates: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          label: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind: string
+          label: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          label?: string
+        }
+        Relationships: []
+      }
       pre_assessments: {
         Row: {
           admin_notes: string | null
@@ -410,10 +470,48 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_admin_weekly_stats: {
+        Row: {
+          approved: number | null
+          high_risk: number | null
+          rejected: number | null
+          submitted: number | null
+          week: string | null
+        }
+        Relationships: []
+      }
+      v_reporter_summary: {
+        Row: {
+          block_reason: string | null
+          blocked_at: string | null
+          blocked_until: string | null
+          country: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string | null
+          is_verified: boolean | null
+          phone: string | null
+          reports_approved: number | null
+          reports_pending: number | null
+          reports_rejected: number | null
+          reports_total: number | null
+          username: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      admin_unblock_user: { Args: { _user_id: string }; Returns: undefined }
+      bulk_update_report_status: {
+        Args: {
+          _ids: string[]
+          _note?: string
+          _status: Database["public"]["Enums"]["report_status"]
+        }
+        Returns: number
+      }
       generate_ticket_number: { Args: never; Returns: string }
+      grant_admin_role: { Args: { _user_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -443,6 +541,7 @@ export type Database = {
         }
         Returns: Json
       }
+      revoke_admin_role: { Args: { _user_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user" | "super_admin"
