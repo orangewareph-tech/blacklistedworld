@@ -7,7 +7,7 @@ const searchSchema = z.object({
   q: z.string().optional(),
 });
 
-export const Route = createFileRoute("/reports")({
+export const Route = createFileRoute("/reports/")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
