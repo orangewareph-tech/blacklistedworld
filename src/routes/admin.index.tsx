@@ -50,12 +50,12 @@ type AdminReport = {
   submitter_id: string | null;
 };
 
-type Tab = "reports" | "reporters" | "flags" | "users" | "audit";
+type Tab = "dashboard" | "queue" | "reports" | "reporters" | "flags" | "users" | "audit" | "abuse";
 
 function AdminPage() {
-  const { user, isAdmin, loading, signOut } = useAuth();
+  const { user, isAdmin, isSuperAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>("reports");
+  const [tab, setTab] = useState<Tab>("dashboard");
   const [stats, setStats] = useState({ pending: 0, approved: 0, rejected: 0, flags: 0, reporters: 0 });
 
   useEffect(() => {
@@ -81,10 +81,13 @@ function AdminPage() {
   if (loading || !user || !isAdmin) return null;
 
   const tabs: { k: Tab; label: string; icon: typeof FileText }[] = [
+    { k: "dashboard", label: "Dashboard", icon: BarChart3 },
+    { k: "queue", label: `Queue${stats.pending ? ` (${stats.pending})` : ""}`, icon: Inbox },
     { k: "reports", label: "Reports", icon: FileText },
     { k: "reporters", label: "Reporters", icon: Users },
-    { k: "flags", label: "Flags", icon: Flag },
+    { k: "flags", label: `Flags${stats.flags ? ` (${stats.flags})` : ""}`, icon: Flag },
     { k: "users", label: "Admins", icon: ShieldCheck },
+    { k: "abuse", label: "Abuse", icon: Shield },
     { k: "audit", label: "Audit Log", icon: History },
   ];
 
@@ -96,13 +99,17 @@ function AdminPage() {
             <Link to="/" className="text-xs text-muted-foreground hover:text-white">← Site</Link>
             <h1 className="text-2xl font-bold mt-1 flex items-center gap-2">
               <ShieldCheck className="h-6 w-6 text-[var(--accent)]" strokeWidth={1.75} /> Admin CMS
+              {isSuperAdmin && <span className="text-[0.6rem] uppercase bg-[var(--accent)]/15 text-[var(--accent)] px-1.5 py-0.5 rounded">super</span>}
             </h1>
             <p className="text-xs text-muted-foreground mt-1">Signed in as {user.email}</p>
           </div>
-          <button onClick={() => signOut().then(() => navigate({ to: "/admin/login" }))}
-            className="bl-btn bl-btn-outline text-xs flex items-center gap-1.5">
-            <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} /> Sign out
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <button onClick={() => signOut().then(() => navigate({ to: "/admin/login" }))}
+              className="bl-btn bl-btn-outline text-xs flex items-center gap-1.5">
+              <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} /> Sign out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
@@ -132,10 +139,13 @@ function AdminPage() {
           })}
         </div>
 
+        {tab === "dashboard" && <DashboardPanel />}
+        {tab === "queue" && <QueuePanel onChange={loadStats} />}
         {tab === "reports" && <ReportsPanel onChange={loadStats} />}
         {tab === "reporters" && <ReportersPanel />}
         {tab === "flags" && <FlagsPanel onChange={loadStats} />}
-        {tab === "users" && <UsersPanel />}
+        {tab === "users" && <UsersPanel isSuperAdmin={isSuperAdmin} />}
+        {tab === "abuse" && <AbusePanel />}
         {tab === "audit" && <AuditPanel />}
       </div>
     </div>
@@ -153,6 +163,7 @@ async function logAction(action: string, target_type: string | null, target_id: 
     _metadata: metadata as never,
   });
 }
+
 
 /* -------------------- Reports Panel -------------------- */
 
