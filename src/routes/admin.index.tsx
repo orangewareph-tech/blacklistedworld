@@ -3,9 +3,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Search, Filter, Edit3, Trash2, Check, X, RotateCcw, ShieldCheck,
   ShieldOff, UserCheck, UserX, FileText, Users, Flag, History, LogOut, Eye,
+  BarChart3, Inbox, Shield, Download, CheckSquare, Square,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { downloadCsv } from "@/lib/csv";
+import { NotificationBell } from "@/components/admin/NotificationBell";
+import { DashboardPanel } from "@/components/admin/DashboardPanel";
+import { QueuePanel } from "@/components/admin/QueuePanel";
+import { AbusePanel } from "@/components/admin/AbusePanel";
+import { EvidenceList } from "@/components/admin/EvidencePreview";
+
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
