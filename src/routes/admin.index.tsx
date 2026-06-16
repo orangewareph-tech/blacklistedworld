@@ -718,12 +718,17 @@ function UsersPanel({ isSuperAdmin }: { isSuperAdmin: boolean }) {
                 </td>
                 <td className="p-3 text-muted-foreground text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
                 <td className="p-3 text-right">
-                  <button disabled={busy} onClick={() => toggleAdmin(u)} className="bl-btn bl-btn-outline text-xs inline-flex items-center gap-1">
-                    {u.roles.includes("admin") ?
-                      <><ShieldOff className="h-3 w-3" strokeWidth={1.75} /> Remove admin</> :
-                      <><ShieldCheck className="h-3 w-3" strokeWidth={1.75} /> Make admin</>}
-                  </button>
+                  {isSuperAdmin ? (
+                    <button disabled={busy} onClick={() => toggleAdmin(u)} className="bl-btn bl-btn-outline text-xs inline-flex items-center gap-1">
+                      {u.roles.includes("admin") ?
+                        <><ShieldOff className="h-3 w-3" strokeWidth={1.75} /> Remove admin</> :
+                        <><ShieldCheck className="h-3 w-3" strokeWidth={1.75} /> Make admin</>}
+                    </button>
+                  ) : (
+                    <span className="text-[0.65rem] text-muted-foreground">super admin only</span>
+                  )}
                 </td>
+
               </tr>
             ))}
           </tbody>
