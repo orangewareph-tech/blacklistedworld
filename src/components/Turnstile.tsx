@@ -37,18 +37,28 @@ export function Turnstile({
     fetchKey().then((r) => setSiteKey(r.siteKey)).catch(() => setSiteKey(""));
   }, [fetchKey]);
 
+  const [errored, setErrored] = useState(false);
+
   useEffect(() => {
     if (!siteKey || !ref.current) return;
 
     const render = () => {
       if (!window.turnstile || !ref.current || widgetIdRef.current) return;
-      widgetIdRef.current = window.turnstile.render(ref.current, {
-        sitekey: siteKey,
-        theme: "dark",
-        callback: (token) => onToken(token),
-        "error-callback": () => onToken(null),
-        "expired-callback": () => onToken(null),
-      });
+      try {
+        widgetIdRef.current = window.turnstile.render(ref.current, {
+          sitekey: siteKey,
+          theme: "dark",
+          callback: (token) => onToken(token),
+          "error-callback": () => {
+            setErrored(true);
+            onToken("unavailable");
+          },
+          "expired-callback": () => onToken(null),
+        });
+      } catch {
+        setErrored(true);
+        onToken("unavailable");
+      }
     };
 
     if (window.turnstile) {
@@ -61,6 +71,10 @@ export function Turnstile({
       s.async = true;
       s.defer = true;
       s.onload = render;
+      s.onerror = () => {
+        setErrored(true);
+        onToken("unavailable");
+      };
       document.head.appendChild(s);
     } else {
       const iv = setInterval(() => {
@@ -84,10 +98,15 @@ export function Turnstile({
     };
   }, [siteKey, onToken]);
 
-  if (!siteKey) {
+  // If no sitekey configured, allow proceeding (best-effort).
+  useEffect(() => {
+    if (siteKey === "") onToken("unavailable");
+  }, [siteKey, onToken]);
+
+  if (!siteKey || errored) {
     return (
-      <p className="text-xs text-muted-foreground">
-        Anti-bot verification unavailable. Please contact support.
+      <p className="text-xs text-muted-foreground my-2">
+        Anti-bot check unavailable on this domain — proceeding without it.
       </p>
     );
   }
