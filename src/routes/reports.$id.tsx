@@ -3,11 +3,65 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { CheckCircle2, Flag } from "lucide-react";
-
+import { getPublicReport } from "@/lib/reports-public.functions";
 
 export const Route = createFileRoute("/reports/$id")({
+  loader: async ({ params }) => {
+    const r = await getPublicReport({ data: { id: params.id } });
+    return { report: r };
+  },
+  head: ({ loaderData }) => {
+    const r = loaderData?.report;
+    if (!r) {
+      return {
+        meta: [
+          { title: "Report — BlackListed" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    const title = `${r.subject_name}${r.country ? ` (${r.country})` : ""} — ${r.category} | BlackListed`;
+    const description = (r.description ?? "").slice(0, 155).replace(/\s+/g, " ").trim();
+    const url = `https://www.blacklisted.world/reports/${r.id}`;
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Report",
+      name: r.subject_name,
+      description,
+      url,
+      datePublished: r.created_at,
+      reportNumber: r.id,
+      about: {
+        "@type": "Organization",
+        name: r.subject_name,
+        ...(r.alias ? { alternateName: r.alias } : {}),
+        ...(r.country ? { address: { "@type": "PostalAddress", addressCountry: r.country, addressLocality: r.city ?? undefined } } : {}),
+        ...(r.industry ? { industry: r.industry } : {}),
+      },
+      keywords: [r.category, r.transaction_type, r.industry, "fraud", "scam", "blacklist"].filter(Boolean).join(", "),
+    };
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index,follow" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(jsonLd) },
+      ],
+    };
+  },
   component: ReportDetail,
 });
+
 
 type Report = {
   id: string;
