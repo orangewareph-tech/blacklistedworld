@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyPhoneRouteImport } from './routes/verify-phone'
 import { Route as SubmitRouteImport } from './routes/submit'
-import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PreAssessmentRouteImport } from './routes/pre-assessment'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -19,6 +18,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReportsIndexRouteImport } from './routes/reports.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ReportsIdRouteImport } from './routes/reports.$id'
 import { Route as AdminSetupRouteImport } from './routes/admin.setup'
@@ -32,11 +32,6 @@ const VerifyPhoneRoute = VerifyPhoneRouteImport.update({
 const SubmitRoute = SubmitRouteImport.update({
   id: '/submit',
   path: '/submit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -74,15 +69,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportsIndexRoute = ReportsIndexRouteImport.update({
+  id: '/reports/',
+  path: '/reports/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
 const ReportsIdRoute = ReportsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ReportsRoute,
+  id: '/reports/$id',
+  path: '/reports/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSetupRoute = AdminSetupRouteImport.update({
   id: '/setup',
@@ -103,13 +103,13 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/pre-assessment': typeof PreAssessmentRoute
   '/profile': typeof ProfileRoute
-  '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
   '/verify-phone': typeof VerifyPhoneRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/setup': typeof AdminSetupRoute
   '/reports/$id': typeof ReportsIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/reports/': typeof ReportsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,13 +118,13 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/pre-assessment': typeof PreAssessmentRoute
   '/profile': typeof ProfileRoute
-  '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
   '/verify-phone': typeof VerifyPhoneRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/setup': typeof AdminSetupRoute
   '/reports/$id': typeof ReportsIdRoute
   '/admin': typeof AdminIndexRoute
+  '/reports': typeof ReportsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -135,13 +135,13 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/pre-assessment': typeof PreAssessmentRoute
   '/profile': typeof ProfileRoute
-  '/reports': typeof ReportsRouteWithChildren
   '/submit': typeof SubmitRoute
   '/verify-phone': typeof VerifyPhoneRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/setup': typeof AdminSetupRoute
   '/reports/$id': typeof ReportsIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/reports/': typeof ReportsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -153,13 +153,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pre-assessment'
     | '/profile'
-    | '/reports'
     | '/submit'
     | '/verify-phone'
     | '/admin/login'
     | '/admin/setup'
     | '/reports/$id'
     | '/admin/'
+    | '/reports/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -168,13 +168,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pre-assessment'
     | '/profile'
-    | '/reports'
     | '/submit'
     | '/verify-phone'
     | '/admin/login'
     | '/admin/setup'
     | '/reports/$id'
     | '/admin'
+    | '/reports'
   id:
     | '__root__'
     | '/'
@@ -184,13 +184,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/pre-assessment'
     | '/profile'
-    | '/reports'
     | '/submit'
     | '/verify-phone'
     | '/admin/login'
     | '/admin/setup'
     | '/reports/$id'
     | '/admin/'
+    | '/reports/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -201,9 +201,10 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   PreAssessmentRoute: typeof PreAssessmentRoute
   ProfileRoute: typeof ProfileRoute
-  ReportsRoute: typeof ReportsRouteWithChildren
   SubmitRoute: typeof SubmitRoute
   VerifyPhoneRoute: typeof VerifyPhoneRoute
+  ReportsIdRoute: typeof ReportsIdRoute
+  ReportsIndexRoute: typeof ReportsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -220,13 +221,6 @@ declare module '@tanstack/react-router' {
       path: '/submit'
       fullPath: '/submit'
       preLoaderRoute: typeof SubmitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -278,6 +272,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reports/': {
+      id: '/reports/'
+      path: '/reports'
+      fullPath: '/reports/'
+      preLoaderRoute: typeof ReportsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -287,10 +288,10 @@ declare module '@tanstack/react-router' {
     }
     '/reports/$id': {
       id: '/reports/$id'
-      path: '/$id'
+      path: '/reports/$id'
       fullPath: '/reports/$id'
       preLoaderRoute: typeof ReportsIdRouteImport
-      parentRoute: typeof ReportsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/setup': {
       id: '/admin/setup'
@@ -323,17 +324,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface ReportsRouteChildren {
-  ReportsIdRoute: typeof ReportsIdRoute
-}
-
-const ReportsRouteChildren: ReportsRouteChildren = {
-  ReportsIdRoute: ReportsIdRoute,
-}
-
-const ReportsRouteWithChildren =
-  ReportsRoute._addFileChildren(ReportsRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -342,9 +332,10 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   PreAssessmentRoute: PreAssessmentRoute,
   ProfileRoute: ProfileRoute,
-  ReportsRoute: ReportsRouteWithChildren,
   SubmitRoute: SubmitRoute,
   VerifyPhoneRoute: VerifyPhoneRoute,
+  ReportsIdRoute: ReportsIdRoute,
+  ReportsIndexRoute: ReportsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -3,9 +3,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Search, Filter, Edit3, Trash2, Check, X, RotateCcw, ShieldCheck,
   ShieldOff, UserCheck, UserX, FileText, Users, Flag, History, LogOut, Eye,
+  BarChart3, Inbox, Shield, Download, CheckSquare, Square,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { downloadCsv } from "@/lib/csv";
+import { NotificationBell } from "@/components/admin/NotificationBell";
+import { DashboardPanel } from "@/components/admin/DashboardPanel";
+import { QueuePanel } from "@/components/admin/QueuePanel";
+import { AbusePanel } from "@/components/admin/AbusePanel";
+import { EvidenceList } from "@/components/admin/EvidencePreview";
+
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
@@ -42,12 +50,12 @@ type AdminReport = {
   submitter_id: string | null;
 };
 
-type Tab = "reports" | "reporters" | "flags" | "users" | "audit";
+type Tab = "dashboard" | "queue" | "reports" | "reporters" | "flags" | "users" | "audit" | "abuse";
 
 function AdminPage() {
-  const { user, isAdmin, loading, signOut } = useAuth();
+  const { user, isAdmin, isSuperAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>("reports");
+  const [tab, setTab] = useState<Tab>("dashboard");
   const [stats, setStats] = useState({ pending: 0, approved: 0, rejected: 0, flags: 0, reporters: 0 });
 
   useEffect(() => {
@@ -73,10 +81,13 @@ function AdminPage() {
   if (loading || !user || !isAdmin) return null;
 
   const tabs: { k: Tab; label: string; icon: typeof FileText }[] = [
+    { k: "dashboard", label: "Dashboard", icon: BarChart3 },
+    { k: "queue", label: `Queue${stats.pending ? ` (${stats.pending})` : ""}`, icon: Inbox },
     { k: "reports", label: "Reports", icon: FileText },
     { k: "reporters", label: "Reporters", icon: Users },
-    { k: "flags", label: "Flags", icon: Flag },
+    { k: "flags", label: `Flags${stats.flags ? ` (${stats.flags})` : ""}`, icon: Flag },
     { k: "users", label: "Admins", icon: ShieldCheck },
+    { k: "abuse", label: "Abuse", icon: Shield },
     { k: "audit", label: "Audit Log", icon: History },
   ];
 
@@ -88,13 +99,17 @@ function AdminPage() {
             <Link to="/" className="text-xs text-muted-foreground hover:text-white">← Site</Link>
             <h1 className="text-2xl font-bold mt-1 flex items-center gap-2">
               <ShieldCheck className="h-6 w-6 text-[var(--accent)]" strokeWidth={1.75} /> Admin CMS
+              {isSuperAdmin && <span className="text-[0.6rem] uppercase bg-[var(--accent)]/15 text-[var(--accent)] px-1.5 py-0.5 rounded">super</span>}
             </h1>
             <p className="text-xs text-muted-foreground mt-1">Signed in as {user.email}</p>
           </div>
-          <button onClick={() => signOut().then(() => navigate({ to: "/admin/login" }))}
-            className="bl-btn bl-btn-outline text-xs flex items-center gap-1.5">
-            <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} /> Sign out
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <button onClick={() => signOut().then(() => navigate({ to: "/admin/login" }))}
+              className="bl-btn bl-btn-outline text-xs flex items-center gap-1.5">
+              <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} /> Sign out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
@@ -124,10 +139,13 @@ function AdminPage() {
           })}
         </div>
 
+        {tab === "dashboard" && <DashboardPanel />}
+        {tab === "queue" && <QueuePanel onChange={loadStats} />}
         {tab === "reports" && <ReportsPanel onChange={loadStats} />}
         {tab === "reporters" && <ReportersPanel />}
         {tab === "flags" && <FlagsPanel onChange={loadStats} />}
-        {tab === "users" && <UsersPanel />}
+        {tab === "users" && <UsersPanel isSuperAdmin={isSuperAdmin} />}
+        {tab === "abuse" && <AbusePanel />}
         {tab === "audit" && <AuditPanel />}
       </div>
     </div>
@@ -146,6 +164,7 @@ async function logAction(action: string, target_type: string | null, target_id: 
   });
 }
 
+
 /* -------------------- Reports Panel -------------------- */
 
 function ReportsPanel({ onChange }: { onChange: () => void }) {
@@ -157,6 +176,8 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
   const [reports, setReports] = useState<AdminReport[]>([]);
   const [editing, setEditing] = useState<AdminReport | null>(null);
   const [busy, setBusy] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [categories, setCategories] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     let q = supabase
@@ -173,7 +194,10 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
       q = q.or(`subject_name.ilike.${s},alias.ilike.${s},email.ilike.${s},website.ilike.${s},ticket_number.ilike.${s}`);
     }
     const { data } = await q;
-    setReports((data as AdminReport[] | null) ?? []);
+    const rows = (data as AdminReport[] | null) ?? [];
+    setReports(rows);
+    setSelected(new Set());
+    setCategories(Array.from(new Set(rows.map((r) => r.category).filter(Boolean))).sort());
   }, [status, risk, country, search]);
 
   useEffect(() => { load(); }, [load]);
@@ -196,12 +220,59 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
     setReports((rs) => rs.map((x) => (x.id === r.id ? { ...x, risk: newRisk } : x)));
   };
 
+  const updateCategory = async (r: AdminReport, newCat: string) => {
+    if (!newCat || newCat === r.category) return;
+    await supabase.from("reports").update({ category: newCat }).eq("id", r.id);
+    await logAction("report.category_change", "report", r.id, `category → ${newCat} on "${r.subject_name}"`, { from: r.category, to: newCat });
+    setReports((rs) => rs.map((x) => (x.id === r.id ? { ...x, category: newCat } : x)));
+  };
+
   const remove = async (r: AdminReport) => {
     if (!confirm(`Delete report "${r.subject_name}" permanently?`)) return;
     await supabase.from("reports").delete().eq("id", r.id);
     await logAction("report.delete", "report", r.id, `deleted "${r.subject_name}"`, { ticket: r.ticket_number });
     setReports((rs) => rs.filter((x) => x.id !== r.id));
     onChange();
+  };
+
+  const toggle = (id: string) => setSelected((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const toggleAll = () => setSelected((s) => s.size === reports.length ? new Set() : new Set(reports.map((r) => r.id)));
+
+  const bulkUpdate = async (newStatus: ReportStatus) => {
+    if (selected.size === 0) return;
+    if (!confirm(`Set ${selected.size} report(s) to ${newStatus}?`)) return;
+    setBusy(true);
+    await supabase.rpc("bulk_update_report_status", { _ids: Array.from(selected), _status: newStatus, _note: undefined });
+    setSelected(new Set());
+    await load();
+    onChange();
+    setBusy(false);
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    if (!confirm(`Permanently delete ${selected.size} report(s)?`)) return;
+    setBusy(true);
+    const ids = Array.from(selected);
+    await supabase.from("reports").delete().in("id", ids);
+    await logAction("report.bulk_delete", "report", null, `deleted ${ids.length} reports`, { ids });
+    setSelected(new Set());
+    await load();
+    onChange();
+    setBusy(false);
+  };
+
+  const exportCsv = () => {
+    if (reports.length === 0) return;
+    downloadCsv(`reports-${Date.now()}.csv`, reports.map((r) => ({
+      ticket_number: r.ticket_number, subject_name: r.subject_name, alias: r.alias,
+      category: r.category, transaction_type: r.transaction_type, industry: r.industry,
+      country: r.country, city: r.city, status: r.status, risk: r.risk,
+      amount_usd: r.amount_usd, email: r.email, phone: r.phone, website: r.website,
+      created_at: r.created_at,
+    })));
   };
 
   return (
@@ -248,36 +319,74 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
           <div className="text-xs text-muted-foreground self-center flex items-center gap-1.5">
             <Filter className="h-3.5 w-3.5" strokeWidth={1.75} /> {reports.length} result(s)
           </div>
+          <button onClick={exportCsv} className="bl-btn bl-btn-outline text-xs flex items-center gap-1.5">
+            <Download className="h-3.5 w-3.5" strokeWidth={1.75} /> Export CSV
+          </button>
         </div>
       </div>
+
+      {selected.size > 0 && (
+        <div className="bl-card p-3 mb-3 flex items-center justify-between gap-3 flex-wrap border-[var(--accent)]/40">
+          <span className="text-xs">{selected.size} selected</span>
+          <div className="flex gap-2 flex-wrap">
+            <button disabled={busy} onClick={() => bulkUpdate("approved")} className="bl-btn bl-btn-primary text-xs flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5" strokeWidth={1.75} /> Approve all
+            </button>
+            <button disabled={busy} onClick={() => bulkUpdate("rejected")} className="bl-btn bl-btn-outline text-xs flex items-center gap-1.5">
+              <X className="h-3.5 w-3.5" strokeWidth={1.75} /> Reject all
+            </button>
+            <button disabled={busy} onClick={() => bulkUpdate("resolved")} className="bl-btn bl-btn-outline text-xs">Resolve all</button>
+            <button disabled={busy} onClick={bulkDelete} className="bl-btn bl-btn-outline text-xs text-[var(--accent)] flex items-center gap-1.5">
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} /> Delete all
+            </button>
+            <button onClick={() => setSelected(new Set())} className="bl-btn bl-btn-outline text-xs">Clear</button>
+          </div>
+        </div>
+      )}
+
+      {reports.length > 0 && (
+        <button onClick={toggleAll} className="text-xs text-muted-foreground hover:text-white inline-flex items-center gap-1.5 mb-2">
+          {selected.size === reports.length ? <CheckSquare className="h-3.5 w-3.5" strokeWidth={1.75} /> : <Square className="h-3.5 w-3.5" strokeWidth={1.75} />}
+          {selected.size === reports.length ? "Deselect all" : "Select all"}
+        </button>
+      )}
 
       <div className="space-y-3">
         {reports.length === 0 ? (
           <p className="text-muted-foreground text-sm">No reports match these filters.</p>
         ) : reports.map((r) => (
-          <div key={r.id} className="bl-card p-5">
+          <div key={r.id} className={`bl-card p-5 ${selected.has(r.id) ? "border-[var(--accent)]/60" : ""}`}>
             <div className="flex justify-between items-start gap-3 mb-2 flex-wrap">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Link to="/reports/$id" params={{ id: r.id }} className="font-bold hover:underline">{r.subject_name}</Link>
-                  {r.ticket_number && <span className="text-[0.65rem] text-muted-foreground font-mono">#{r.ticket_number}</span>}
-                  <span className={`text-[0.6rem] uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                    r.status === "approved" ? "bg-green-500/15 text-green-300" :
-                    r.status === "rejected" ? "bg-red-500/15 text-red-300" :
-                    r.status === "resolved" ? "bg-blue-500/15 text-blue-300" :
-                    "bg-yellow-500/15 text-yellow-300"
-                  }`}>{r.status}</span>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {r.category} · {r.transaction_type} · {r.country ?? "—"} · {new Date(r.created_at).toLocaleString()}
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <button onClick={() => toggle(r.id)} className="mt-1 text-muted-foreground hover:text-white" aria-label="Select report">
+                  {selected.has(r.id) ? <CheckSquare className="h-4 w-4 text-[var(--accent)]" strokeWidth={1.75} /> : <Square className="h-4 w-4" strokeWidth={1.75} />}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Link to="/reports/$id" params={{ id: r.id }} className="font-bold hover:underline">{r.subject_name}</Link>
+                    {r.ticket_number && <span className="text-[0.65rem] text-muted-foreground font-mono">#{r.ticket_number}</span>}
+                    <span className={`text-[0.6rem] uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                      r.status === "approved" ? "bg-green-500/15 text-green-300" :
+                      r.status === "rejected" ? "bg-red-500/15 text-red-300" :
+                      r.status === "resolved" ? "bg-blue-500/15 text-blue-300" :
+                      "bg-yellow-500/15 text-yellow-300"
+                    }`}>{r.status}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {r.transaction_type} · {r.country ?? "—"} · {new Date(r.created_at).toLocaleString()}
+                  </div>
                 </div>
               </div>
-              <select value={r.risk} onChange={(e) => updateRisk(r, e.target.value as RiskLevel)}
-                className="bl-input text-xs py-1 px-2 h-8 w-auto">
-                <option value="low">low</option>
-                <option value="medium">medium</option>
-                <option value="high">high</option>
-              </select>
+              <div className="flex gap-2 items-center">
+                <select value={r.category} onChange={(e) => updateCategory(r, e.target.value)} className="bl-input text-xs py-1 px-2 h-8 w-auto" title="Category">
+                  {[r.category, ...categories.filter((c) => c !== r.category)].map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <select value={r.risk} onChange={(e) => updateRisk(r, e.target.value as RiskLevel)} className="bl-input text-xs py-1 px-2 h-8 w-auto" title="Risk">
+                  <option value="low">low</option>
+                  <option value="medium">medium</option>
+                  <option value="high">high</option>
+                </select>
+              </div>
             </div>
             <p className="text-sm text-[#bbb] line-clamp-3 mb-3">{r.description}</p>
             <div className="flex gap-2 flex-wrap">
@@ -317,6 +426,7 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
     </div>
   );
 }
+
 
 /* -------------------- Edit Modal -------------------- */
 
@@ -394,6 +504,10 @@ function EditReportModal({ report, onClose, onSaved }: {
         </div>
         <Field label="Description"><textarea rows={5} className="bl-input w-full" value={form.description} onChange={(e) => set("description", e.target.value)} /></Field>
         <Field label="Admin notes (internal)"><textarea rows={3} className="bl-input w-full" value={form.admin_notes ?? ""} onChange={(e) => set("admin_notes", e.target.value || null)} /></Field>
+        <Field label="Evidence">
+          <EvidenceList reportId={form.id} />
+        </Field>
+
         <div className="flex gap-2 justify-end mt-5">
           <button onClick={onClose} className="bl-btn bl-btn-outline text-xs">Cancel</button>
           <button disabled={busy} onClick={save} className="bl-btn bl-btn-primary text-xs">{busy ? "Saving…" : "Save changes"}</button>
@@ -615,7 +729,7 @@ function FlagsPanel({ onChange }: { onChange: () => void }) {
 /* -------------------- Admins (Users with admin role) Panel -------------------- */
 
 type UserRow = { id: string; display_name: string | null; country: string | null; is_verified: boolean; created_at: string; roles: string[] };
-function UsersPanel() {
+function UsersPanel({ isSuperAdmin }: { isSuperAdmin: boolean }) {
   const { user: me } = useAuth();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [busy, setBusy] = useState(false);
@@ -639,20 +753,20 @@ function UsersPanel() {
   useEffect(() => { load(); }, [load]);
 
   const toggleAdmin = async (u: UserRow) => {
+    if (!isSuperAdmin) return;
     if (u.id === me?.id && u.roles.includes("admin")) {
       if (!confirm("Remove YOUR OWN admin role? You'll be locked out of the CMS.")) return;
     }
     setBusy(true);
     if (u.roles.includes("admin")) {
-      await supabase.from("user_roles").delete().eq("user_id", u.id).eq("role", "admin");
-      await logAction("role.revoke_admin", "user", u.id, `revoked admin from ${u.display_name ?? u.id.slice(0, 8)}`);
+      await supabase.rpc("revoke_admin_role", { _user_id: u.id });
     } else {
-      await supabase.from("user_roles").insert({ user_id: u.id, role: "admin" });
-      await logAction("role.grant_admin", "user", u.id, `granted admin to ${u.display_name ?? u.id.slice(0, 8)}`);
+      await supabase.rpc("grant_admin_role", { _user_id: u.id });
     }
     await load();
     setBusy(false);
   };
+
 
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
@@ -699,12 +813,17 @@ function UsersPanel() {
                 </td>
                 <td className="p-3 text-muted-foreground text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
                 <td className="p-3 text-right">
-                  <button disabled={busy} onClick={() => toggleAdmin(u)} className="bl-btn bl-btn-outline text-xs inline-flex items-center gap-1">
-                    {u.roles.includes("admin") ?
-                      <><ShieldOff className="h-3 w-3" strokeWidth={1.75} /> Remove admin</> :
-                      <><ShieldCheck className="h-3 w-3" strokeWidth={1.75} /> Make admin</>}
-                  </button>
+                  {isSuperAdmin ? (
+                    <button disabled={busy} onClick={() => toggleAdmin(u)} className="bl-btn bl-btn-outline text-xs inline-flex items-center gap-1">
+                      {u.roles.includes("admin") ?
+                        <><ShieldOff className="h-3 w-3" strokeWidth={1.75} /> Remove admin</> :
+                        <><ShieldCheck className="h-3 w-3" strokeWidth={1.75} /> Make admin</>}
+                    </button>
+                  ) : (
+                    <span className="text-[0.65rem] text-muted-foreground">super admin only</span>
+                  )}
                 </td>
+
               </tr>
             ))}
           </tbody>

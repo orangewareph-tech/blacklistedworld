@@ -6,6 +6,7 @@ type AuthCtx = {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -14,6 +15,7 @@ const Ctx = createContext<AuthCtx>({
   user: null,
   session: null,
   isAdmin: false,
+  isSuperAdmin: false,
   loading: true,
   signOut: async () => {},
 });
@@ -21,24 +23,27 @@ const Ctx = createContext<AuthCtx>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       if (s?.user) {
-        // Defer role check to avoid deadlock
         setTimeout(() => {
           supabase
             .from("user_roles")
             .select("role")
             .eq("user_id", s.user.id)
-            .eq("role", "admin")
-            .maybeSingle()
-            .then(({ data }) => setIsAdmin(!!data));
+            .then(({ data }) => {
+              const roles = (data ?? []).map((r) => r.role as string);
+              setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));
+              setIsSuperAdmin(roles.includes("super_admin"));
+            });
         }, 0);
       } else {
         setIsAdmin(false);
+        setIsSuperAdmin(false);
       }
     });
 
@@ -56,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: session?.user ?? null,
         session,
         isAdmin,
+        isSuperAdmin,
         loading,
         signOut: async () => {
           await supabase.auth.signOut();
@@ -68,3 +74,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export const useAuth = () => useContext(Ctx);
+
