@@ -1,44 +1,42 @@
-## Goal
-Lock down registration and submissions: every applicant must register, verify email, pass CAPTCHA, optionally verify a phone number, and receive a ticket number upon submitting a report or pre‑assessment.
+# Full Admin CMS Upgrade
 
-## Phase 1 — Database & Auth config
+Delivering all 10 items grouped into 4 phases so each phase ships something usable.
 
-1. **Profiles** — add `username` (unique, lowercased, 3–24 chars, `[a-z0-9_]`), `phone_verified_at` (timestamptz), `email_verified_at` (timestamptz). Trigger `handle_new_user` updated to pull `username` from signup metadata; add unique index.
-2. **Reports** — add `ticket_number text unique` populated by a `BEFORE INSERT` trigger generating `BL-YYYY-NNNNNN` from a sequence `report_ticket_seq`.
-3. **Pre‑assessments** — new table `pre_assessments` (subject_name, country, transaction_type, description, status, ticket number via same scheme, submitter_id) with RLS: insert by authenticated user, select own + admins, admins manage.
-4. **Auth config** — disable `auto_confirm_email` so users must click the confirmation link before they can submit.
+## Phase 1 — Reports CMS polish
+- Bulk approve / reject / delete with checkbox column on Reports tab.
+- Inline edit for risk and category (popover select, saves immediately, writes audit entry).
+- Evidence preview lightbox (signed URLs, image + PDF inline, others as download).
+- CSV export of the current filtered view.
 
-## Phase 2 — Anti‑bot (Cloudflare Turnstile)
+## Phase 2 — Moderation, Flags, Reporters
+- Dedicated `pending` moderation queue page with keyboard shortcuts (J/K navigate, A approve, R reject, F flag) and reason templates stored in a new `moderation_templates` table.
+- Flags triage page: list `report_flags` grouped by report, resolve / dismiss, jump-to-report.
+- Reporters database: searchable list of submitters (joined from `profiles` + report counts), filters for verified/blocked, drill-down panel showing their reports, quick verify / block / unblock actions (already permitted by RLS, all changes audited).
 
-- Public site key embedded via `VITE_TURNSTILE_SITE_KEY` (build secret).
-- Secret `TURNSTILE_SECRET_KEY` used server‑side.
-- New server fn `verifyTurnstile(token)` (TanStack `createServerFn`) calls `https://challenges.cloudflare.com/turnstile/v0/siteverify`.
-- Widget shown on: signup form, report submit form, pre‑assessment form. Submit buttons disabled until token present; server fns reject if token missing/invalid.
+## Phase 3 — Audit, Roles, Analytics, Abuse
+- Audit log viewer: filterable timeline (actor, action, target, date range) reading `admin_audit_log`, with JSON metadata diff viewer.
+- Role management UI: promote / demote admins (gated to super-admin via new `super_admin` role), with confirmation modal and audit entry. Bootstrap promotes `jayjay2999@gmail.com` to `super_admin`.
+- Dashboard analytics: reports/week line chart, approval SLA, top countries, top categories, risk breakdown — using `recharts` (already in deps) reading from new SQL views.
+- Abuse view: surface `security_events`, blocked accounts list with unblock control, recent captcha/login failures.
 
-## Phase 3 — Mobile OTP (Twilio)
+## Phase 4 — Notifications & Public SEO
+- Admin notifications: in-app bell (new pending high-risk reports + new flags) via realtime subscriptions; optional email digest using existing email infra if configured.
+- Public reports SEO: per-report `head()` with title/description/canonical and JSON-LD `Report`/`Organization`-style schema so approved entries are crawlable.
 
-- Uses Supabase Auth native Phone provider (Twilio backend). User configures Twilio Account SID + Auth Token + From number in the Lovable Cloud → Auth → Phone settings (instructions provided in chat — Supabase tool doesn't expose phone provider config).
-- New `/verify-phone` route: user enters phone → `supabase.auth.signInWithOtp({phone, ...})` style verification via `updateUser({phone})` + OTP code entry. On success, stamp `profiles.phone_verified_at = now()`.
-- Phone verification optional but recommended; a banner on submit pages nudges the user.
+## Technical details
+- New tables (migrations, RLS + GRANTs): `moderation_templates`, `admin_notifications`, `app_role` enum gains `super_admin`. Views: `v_admin_dashboard_stats`, `v_reporter_summary`.
+- All admin mutations call `log_admin_action` RPC so every change is audited.
+- Realtime: subscribe to `reports` (status=pending) and `report_flags` channels from the admin shell to drive notifications.
+- Keyboard shortcuts implemented with a small `useHotkeys` hook scoped to the queue page.
+- CSV export client-side from current table state (no extra endpoint).
+- Evidence signed URLs via existing `evidence` private bucket using `supabase.storage.from('evidence').createSignedUrl(path, 300)`.
+- Admin UI restructured into a left sidebar (`shadcn/ui` Sidebar) with sections: Dashboard, Queue, Reports, Reporters, Flags, Notifications, Audit, Roles, Abuse. Keeps existing `/admin` URL; subpages live under `/admin/queue`, `/admin/reporters`, etc.
+- Server functions only where needed (role grants, signed URL generation for non-owners). All client reads use the authenticated supabase client + RLS.
+- SEO route uses TanStack `head()` reading loader data via the public server fn pattern.
 
-## Phase 4 — Submission gating
+## Out of scope (ask if you want them)
+- Email digest delivery (requires email provider setup).
+- Two-factor auth for admins.
+- Image thumbnails / virus scan on evidence uploads.
 
-- `/submit` and new `/pre-assessment` routes wrapped in a `<RequireVerified>` guard that checks `user.email_confirmed_at` and shows a "Please verify your email" screen with resend button if missing.
-- After successful submission the UI shows the generated `ticket_number` prominently and links to the user's report/ticket page.
-
-## Phase 5 — UI updates
-
-- Auth page: add username field at signup (validated client + server side via Zod), Turnstile widget below the form, "We will email you a confirmation link" notice.
-- New `/profile` section: shows email verification state, phone verification state (with link to verify), and a list of the user's tickets (reports + pre‑assessments) with ticket numbers and status.
-- New `/pre-assessment` page (form similar to submit, fewer fields).
-
-## What I'll need from you
-1. Cloudflare Turnstile **site key** + **secret key** — I'll request them via the secret prompt. (Free at dash.cloudflare.com → Turnstile.)
-2. After this ships, configure Twilio in Lovable Cloud → Auth → Phone provider (Account SID, Auth Token, From number) — instructions will appear in the verify‑phone screen.
-
-## Not in this change
-- IP rate limiting / IP monitoring (backend rate‑limiting primitives not available yet — will be addressed separately).
-- Manual review queue UI for admins beyond what already exists in `/admin`.
-- Identity document upload for "additional identification before publishing serious allegations" — flagged as a follow‑up.
-
-Approve and I'll start with the migration + secret request.
+Ready to start with Phase 1 once you approve.
