@@ -244,7 +244,7 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
     if (selected.size === 0) return;
     if (!confirm(`Set ${selected.size} report(s) to ${newStatus}?`)) return;
     setBusy(true);
-    await supabase.rpc("bulk_update_report_status", { _ids: Array.from(selected), _status: newStatus, _note: null });
+    await supabase.rpc("bulk_update_report_status", { _ids: Array.from(selected), _status: newStatus, _note: undefined });
     setSelected(new Set());
     await load();
     onChange();
