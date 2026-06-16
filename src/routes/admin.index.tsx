@@ -176,6 +176,8 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
   const [reports, setReports] = useState<AdminReport[]>([]);
   const [editing, setEditing] = useState<AdminReport | null>(null);
   const [busy, setBusy] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [categories, setCategories] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     let q = supabase
@@ -192,7 +194,10 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
       q = q.or(`subject_name.ilike.${s},alias.ilike.${s},email.ilike.${s},website.ilike.${s},ticket_number.ilike.${s}`);
     }
     const { data } = await q;
-    setReports((data as AdminReport[] | null) ?? []);
+    const rows = (data as AdminReport[] | null) ?? [];
+    setReports(rows);
+    setSelected(new Set());
+    setCategories(Array.from(new Set(rows.map((r) => r.category).filter(Boolean))).sort());
   }, [status, risk, country, search]);
 
   useEffect(() => { load(); }, [load]);
@@ -215,12 +220,59 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
     setReports((rs) => rs.map((x) => (x.id === r.id ? { ...x, risk: newRisk } : x)));
   };
 
+  const updateCategory = async (r: AdminReport, newCat: string) => {
+    if (!newCat || newCat === r.category) return;
+    await supabase.from("reports").update({ category: newCat }).eq("id", r.id);
+    await logAction("report.category_change", "report", r.id, `category → ${newCat} on "${r.subject_name}"`, { from: r.category, to: newCat });
+    setReports((rs) => rs.map((x) => (x.id === r.id ? { ...x, category: newCat } : x)));
+  };
+
   const remove = async (r: AdminReport) => {
     if (!confirm(`Delete report "${r.subject_name}" permanently?`)) return;
     await supabase.from("reports").delete().eq("id", r.id);
     await logAction("report.delete", "report", r.id, `deleted "${r.subject_name}"`, { ticket: r.ticket_number });
     setReports((rs) => rs.filter((x) => x.id !== r.id));
     onChange();
+  };
+
+  const toggle = (id: string) => setSelected((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const toggleAll = () => setSelected((s) => s.size === reports.length ? new Set() : new Set(reports.map((r) => r.id)));
+
+  const bulkUpdate = async (newStatus: ReportStatus) => {
+    if (selected.size === 0) return;
+    if (!confirm(`Set ${selected.size} report(s) to ${newStatus}?`)) return;
+    setBusy(true);
+    await supabase.rpc("bulk_update_report_status", { _ids: Array.from(selected), _status: newStatus, _note: null });
+    setSelected(new Set());
+    await load();
+    onChange();
+    setBusy(false);
+  };
+
+  const bulkDelete = async () => {
+    if (selected.size === 0) return;
+    if (!confirm(`Permanently delete ${selected.size} report(s)?`)) return;
+    setBusy(true);
+    const ids = Array.from(selected);
+    await supabase.from("reports").delete().in("id", ids);
+    await logAction("report.bulk_delete", "report", null, `deleted ${ids.length} reports`, { ids });
+    setSelected(new Set());
+    await load();
+    onChange();
+    setBusy(false);
+  };
+
+  const exportCsv = () => {
+    if (reports.length === 0) return;
+    downloadCsv(`reports-${Date.now()}.csv`, reports.map((r) => ({
+      ticket_number: r.ticket_number, subject_name: r.subject_name, alias: r.alias,
+      category: r.category, transaction_type: r.transaction_type, industry: r.industry,
+      country: r.country, city: r.city, status: r.status, risk: r.risk,
+      amount_usd: r.amount_usd, email: r.email, phone: r.phone, website: r.website,
+      created_at: r.created_at,
+    })));
   };
 
   return (
@@ -267,36 +319,74 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
           <div className="text-xs text-muted-foreground self-center flex items-center gap-1.5">
             <Filter className="h-3.5 w-3.5" strokeWidth={1.75} /> {reports.length} result(s)
           </div>
+          <button onClick={exportCsv} className="bl-btn bl-btn-outline text-xs flex items-center gap-1.5">
+            <Download className="h-3.5 w-3.5" strokeWidth={1.75} /> Export CSV
+          </button>
         </div>
       </div>
+
+      {selected.size > 0 && (
+        <div className="bl-card p-3 mb-3 flex items-center justify-between gap-3 flex-wrap border-[var(--accent)]/40">
+          <span className="text-xs">{selected.size} selected</span>
+          <div className="flex gap-2 flex-wrap">
+            <button disabled={busy} onClick={() => bulkUpdate("approved")} className="bl-btn bl-btn-primary text-xs flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5" strokeWidth={1.75} /> Approve all
+            </button>
+            <button disabled={busy} onClick={() => bulkUpdate("rejected")} className="bl-btn bl-btn-outline text-xs flex items-center gap-1.5">
+              <X className="h-3.5 w-3.5" strokeWidth={1.75} /> Reject all
+            </button>
+            <button disabled={busy} onClick={() => bulkUpdate("resolved")} className="bl-btn bl-btn-outline text-xs">Resolve all</button>
+            <button disabled={busy} onClick={bulkDelete} className="bl-btn bl-btn-outline text-xs text-[var(--accent)] flex items-center gap-1.5">
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} /> Delete all
+            </button>
+            <button onClick={() => setSelected(new Set())} className="bl-btn bl-btn-outline text-xs">Clear</button>
+          </div>
+        </div>
+      )}
+
+      {reports.length > 0 && (
+        <button onClick={toggleAll} className="text-xs text-muted-foreground hover:text-white inline-flex items-center gap-1.5 mb-2">
+          {selected.size === reports.length ? <CheckSquare className="h-3.5 w-3.5" strokeWidth={1.75} /> : <Square className="h-3.5 w-3.5" strokeWidth={1.75} />}
+          {selected.size === reports.length ? "Deselect all" : "Select all"}
+        </button>
+      )}
 
       <div className="space-y-3">
         {reports.length === 0 ? (
           <p className="text-muted-foreground text-sm">No reports match these filters.</p>
         ) : reports.map((r) => (
-          <div key={r.id} className="bl-card p-5">
+          <div key={r.id} className={`bl-card p-5 ${selected.has(r.id) ? "border-[var(--accent)]/60" : ""}`}>
             <div className="flex justify-between items-start gap-3 mb-2 flex-wrap">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Link to="/reports/$id" params={{ id: r.id }} className="font-bold hover:underline">{r.subject_name}</Link>
-                  {r.ticket_number && <span className="text-[0.65rem] text-muted-foreground font-mono">#{r.ticket_number}</span>}
-                  <span className={`text-[0.6rem] uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                    r.status === "approved" ? "bg-green-500/15 text-green-300" :
-                    r.status === "rejected" ? "bg-red-500/15 text-red-300" :
-                    r.status === "resolved" ? "bg-blue-500/15 text-blue-300" :
-                    "bg-yellow-500/15 text-yellow-300"
-                  }`}>{r.status}</span>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {r.category} · {r.transaction_type} · {r.country ?? "—"} · {new Date(r.created_at).toLocaleString()}
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <button onClick={() => toggle(r.id)} className="mt-1 text-muted-foreground hover:text-white" aria-label="Select report">
+                  {selected.has(r.id) ? <CheckSquare className="h-4 w-4 text-[var(--accent)]" strokeWidth={1.75} /> : <Square className="h-4 w-4" strokeWidth={1.75} />}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Link to="/reports/$id" params={{ id: r.id }} className="font-bold hover:underline">{r.subject_name}</Link>
+                    {r.ticket_number && <span className="text-[0.65rem] text-muted-foreground font-mono">#{r.ticket_number}</span>}
+                    <span className={`text-[0.6rem] uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                      r.status === "approved" ? "bg-green-500/15 text-green-300" :
+                      r.status === "rejected" ? "bg-red-500/15 text-red-300" :
+                      r.status === "resolved" ? "bg-blue-500/15 text-blue-300" :
+                      "bg-yellow-500/15 text-yellow-300"
+                    }`}>{r.status}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {r.transaction_type} · {r.country ?? "—"} · {new Date(r.created_at).toLocaleString()}
+                  </div>
                 </div>
               </div>
-              <select value={r.risk} onChange={(e) => updateRisk(r, e.target.value as RiskLevel)}
-                className="bl-input text-xs py-1 px-2 h-8 w-auto">
-                <option value="low">low</option>
-                <option value="medium">medium</option>
-                <option value="high">high</option>
-              </select>
+              <div className="flex gap-2 items-center">
+                <select value={r.category} onChange={(e) => updateCategory(r, e.target.value)} className="bl-input text-xs py-1 px-2 h-8 w-auto" title="Category">
+                  {[r.category, ...categories.filter((c) => c !== r.category)].map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <select value={r.risk} onChange={(e) => updateRisk(r, e.target.value as RiskLevel)} className="bl-input text-xs py-1 px-2 h-8 w-auto" title="Risk">
+                  <option value="low">low</option>
+                  <option value="medium">medium</option>
+                  <option value="high">high</option>
+                </select>
+              </div>
             </div>
             <p className="text-sm text-[#bbb] line-clamp-3 mb-3">{r.description}</p>
             <div className="flex gap-2 flex-wrap">
@@ -336,6 +426,7 @@ function ReportsPanel({ onChange }: { onChange: () => void }) {
     </div>
   );
 }
+
 
 /* -------------------- Edit Modal -------------------- */
 
