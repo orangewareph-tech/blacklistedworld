@@ -504,6 +504,10 @@ function EditReportModal({ report, onClose, onSaved }: {
         </div>
         <Field label="Description"><textarea rows={5} className="bl-input w-full" value={form.description} onChange={(e) => set("description", e.target.value)} /></Field>
         <Field label="Admin notes (internal)"><textarea rows={3} className="bl-input w-full" value={form.admin_notes ?? ""} onChange={(e) => set("admin_notes", e.target.value || null)} /></Field>
+        <Field label="Evidence">
+          <EvidenceList reportId={form.id} />
+        </Field>
+
         <div className="flex gap-2 justify-end mt-5">
           <button onClick={onClose} className="bl-btn bl-btn-outline text-xs">Cancel</button>
           <button disabled={busy} onClick={save} className="bl-btn bl-btn-primary text-xs">{busy ? "Saving…" : "Save changes"}</button>
