@@ -634,7 +634,7 @@ function FlagsPanel({ onChange }: { onChange: () => void }) {
 /* -------------------- Admins (Users with admin role) Panel -------------------- */
 
 type UserRow = { id: string; display_name: string | null; country: string | null; is_verified: boolean; created_at: string; roles: string[] };
-function UsersPanel() {
+function UsersPanel({ isSuperAdmin }: { isSuperAdmin: boolean }) {
   const { user: me } = useAuth();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [busy, setBusy] = useState(false);
@@ -658,20 +658,20 @@ function UsersPanel() {
   useEffect(() => { load(); }, [load]);
 
   const toggleAdmin = async (u: UserRow) => {
+    if (!isSuperAdmin) return;
     if (u.id === me?.id && u.roles.includes("admin")) {
       if (!confirm("Remove YOUR OWN admin role? You'll be locked out of the CMS.")) return;
     }
     setBusy(true);
     if (u.roles.includes("admin")) {
-      await supabase.from("user_roles").delete().eq("user_id", u.id).eq("role", "admin");
-      await logAction("role.revoke_admin", "user", u.id, `revoked admin from ${u.display_name ?? u.id.slice(0, 8)}`);
+      await supabase.rpc("revoke_admin_role", { _user_id: u.id });
     } else {
-      await supabase.from("user_roles").insert({ user_id: u.id, role: "admin" });
-      await logAction("role.grant_admin", "user", u.id, `granted admin to ${u.display_name ?? u.id.slice(0, 8)}`);
+      await supabase.rpc("grant_admin_role", { _user_id: u.id });
     }
     await load();
     setBusy(false);
   };
+
 
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
